@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.chrischall/alphaportal-mcp",
+  "description": "AlphaPortal school-bus transportation for Claude — students, stops, live bus location, notifications",
+  "repository": {
+    "url": "https://github.com/chrischall/alphaportal-mcp",
+    "source": "github"
+  },
+  "version": "0.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "alphaportal-mcp",
+      "version": "0.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ALPHAPORTAL_REFRESH_TOKEN",
+          "description": "Refresh token captured from a signed-in AlphaPortal browser tab",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

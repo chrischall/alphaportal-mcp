@@ -1,0 +1,29 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "alphaportal-mcp",
+  "owner": {
+    "name": "Chris Hall",
+    "email": "chris.c.hall@gmail.com"
+  },
+  "metadata": {
+    "description": "MCP server for AlphaPortal (AlphaRoute) school-bus transportation — students, stops, live bus location, and notifications",
+    "version": "0.0.0"
+  },
+  "plugins": [
+    {
+      "name": "alphaportal-mcp",
+      "displayName": "AlphaPortal",
+      "source": "./",
+      "description": "MCP server for AlphaPortal school-bus transportation — students, stops, live bus location, and notifications via natural language",
+      "version": "0.0.0",
+      "author": {
+        "name": "Chris Hall"
+      },
+      "homepage": "https://github.com/chrischall/alphaportal-mcp",
+      "repository": "https://github.com/chrischall/alphaportal-mcp",
+      "license": "MIT",
+      "keywords": ["alphaportal", "school-bus", "transportation", "mcp"],
+      "category": "productivity"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "alphaportal": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/index.js"],
+      "env": {
+        "ALPHAPORTAL_REFRESH_TOKEN": "${ALPHAPORTAL_REFRESH_TOKEN}"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+version: 1
+name: AlphaPortal
+slug: alphaportal
+env:
+  - name: ALPHAPORTAL_REFRESH_TOKEN
+    secret: true
+    required: true
+    help: >-
+      The refresh token from a signed-in AlphaPortal browser tab. In the tab's
+      DevTools console run: JSON.parse(localStorage.user).User.RefreshToken —
+      it is an 8-day, reusable JWT, so re-capture and update this secret if it
+      expires.
+state:
+  dataDir: true
+  reason: >-
+    Persists the rotating refresh token under $HOME so each refresh rolls the
+    8-day window forward on a warm machine. Without it the child always falls
+    back to the registration-time ALPHAPORTAL_REFRESH_TOKEN secret, which still
+    works for 8 days from capture but cannot roll forward across cold starts.

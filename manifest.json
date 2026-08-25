@@ -1,0 +1,64 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/dxt/main/dist/mcpb-manifest.schema.json",
+  "manifest_version": "0.3",
+  "name": "alphaportal-mcp",
+  "display_name": "AlphaPortal",
+  "version": "0.0.0",
+  "description": "AlphaPortal school-bus transportation for Claude — students, stops, live bus location, and arrival notifications via natural language",
+  "author": {
+    "name": "Chris Chall",
+    "email": "chris.c.hall@gmail.com",
+    "url": "https://github.com/chrischall"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrischall/alphaportal-mcp"
+  },
+  "homepage": "https://github.com/chrischall/alphaportal-mcp",
+  "support": "https://github.com/chrischall/alphaportal-mcp/issues",
+  "license": "MIT",
+  "keywords": ["alphaportal", "alpharoute", "school-bus", "transportation", "bus-tracking"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/bundle.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/bundle.js"],
+      "env": {
+        "ALPHAPORTAL_REFRESH_TOKEN": "${user_config.alphaportal_refresh_token}"
+      }
+    }
+  },
+  "user_config": {
+    "alphaportal_refresh_token": {
+      "type": "string",
+      "title": "AlphaPortal Refresh Token",
+      "description": "The refresh token from a signed-in AlphaPortal tab: in the DevTools console run JSON.parse(localStorage.user).User.RefreshToken",
+      "required": true,
+      "sensitive": true
+    }
+  },
+  "tools": [
+    { "name": "alphaportal_list_students", "description": "List the children on the account with grade, school, and transportation flags" },
+    { "name": "alphaportal_get_student", "description": "Get a student's school plus morning and afternoon stops" },
+    { "name": "alphaportal_get_student_stops", "description": "Get a student's assigned bus stops with times and locations" },
+    { "name": "alphaportal_get_bus_location", "description": "Get the live GPS location of a student's bus for the AM or PM run" },
+    { "name": "alphaportal_get_report_link", "description": "Get a PDF download link for a student's transportation report" },
+    { "name": "alphaportal_list_notifications", "description": "List transportation arrival/departure notifications" },
+    { "name": "alphaportal_get_profile", "description": "Get the signed-in user profile" },
+    { "name": "alphaportal_get_account", "description": "Get the district account info and current server date" },
+    { "name": "alphaportal_get_settings", "description": "Get the portal feature/visibility settings" },
+    { "name": "alphaportal_list_schools", "description": "List all schools in the district with coordinates" },
+    { "name": "alphaportal_list_grades", "description": "List the district grade levels" },
+    { "name": "alphaportal_list_requests", "description": "List submitted transportation requests with tracking numbers" },
+    { "name": "alphaportal_edit_walk_radius", "description": "Set a student's walk-zone radius (confirm-gated)" },
+    { "name": "alphaportal_set_notification", "description": "Set a student's notification preferences (confirm-gated)" },
+    { "name": "alphaportal_session_status", "description": "Check whether a working AlphaPortal session is configured" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=22.5.0"
+    }
+  }
+}

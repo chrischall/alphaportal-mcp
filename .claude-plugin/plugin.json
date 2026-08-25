@@ -1,0 +1,16 @@
+{
+  "name": "alphaportal-mcp",
+  "displayName": "AlphaPortal",
+  "version": "0.0.0",
+  "description": "MCP server for AlphaPortal (AlphaRoute) school-bus transportation — students, stops, live bus location, and notifications",
+  "author": {
+    "name": "Chris Hall",
+    "email": "chris.c.hall@gmail.com"
+  },
+  "homepage": "https://github.com/chrischall/alphaportal-mcp",
+  "repository": "https://github.com/chrischall/alphaportal-mcp",
+  "license": "MIT",
+  "keywords": ["alphaportal", "alpharoute", "school-bus", "transportation", "mcp"],
+  "skills": "./skills/",
+  "mcp": "./.mcp.json"
+}
