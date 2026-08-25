@@ -43,15 +43,21 @@ export async function refreshAccessToken(
   refreshToken: string,
   fetchImpl: FetchLike = fetch,
 ): Promise<RefreshResult> {
+  const url = `${BASE_URL}/${REFRESH_PATH}`;
   let res: Response;
   try {
-    res = await fetchImpl(`${BASE_URL}/${REFRESH_PATH}`, {
+    res = await fetchImpl(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
     });
   } catch (err) {
-    throw new Error(`AlphaPortal token refresh could not reach the API: ${(err as Error).message}`);
+    // Surface the underlying cause (DNS/TLS/proxy code, or an undici "Illegal
+    // invocation" from a mis-bound fetch) and the exact endpoint, so a
+    // reachability problem is diagnosable rather than opaque.
+    const e = err as Error & { cause?: { code?: string; message?: string } };
+    const cause = e.cause?.code ?? e.cause?.message ?? e.message;
+    throw new Error(`AlphaPortal token refresh could not reach ${url}: ${cause}`);
   }
 
   const text = await res.text();

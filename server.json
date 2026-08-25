@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.chrischall/alphaportal-mcp",
-  "description": "AlphaPortal school-bus transportation for Claude — students, stops, live bus location, notifications",
+  "description": "AlphaPortal school-bus transportation for Claude \u2014 students, stops, live bus location, notifications",
   "repository": {
     "url": "https://github.com/chrischall/alphaportal-mcp",
     "source": "github"
@@ -18,8 +18,8 @@
       "environmentVariables": [
         {
           "name": "ALPHAPORTAL_REFRESH_TOKEN",
-          "description": "Refresh token captured from a signed-in AlphaPortal browser tab",
-          "isRequired": true,
+          "description": "Optional refresh token; if unset, read from a signed-in tab via the fetchproxy bridge",
+          "isRequired": false,
           "format": "string",
           "isSecret": true
         }

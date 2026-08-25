@@ -65,11 +65,54 @@ describe('AlphaPortalClient auth + envelope', () => {
     expect(saves[0][1]).toContain('.'); // a JWT was stored
   });
 
-  it('throws an actionable config error when no refresh token is available', async () => {
-    const client = new AlphaPortalClient({ sessionIO: nullSessionIO, fetchImpl: makeFetch({}) });
-    expect(client.isConfigured()).toBe(false);
+  it('throws an actionable error when no token and the bridge is disabled', async () => {
+    process.env.ALPHAPORTAL_DISABLE_FETCHPROXY = '1';
+    try {
+      const client = new AlphaPortalClient({ sessionIO: nullSessionIO, fetchImpl: makeFetch({}) });
+      expect(client.hasStaticToken()).toBe(false);
+      const err = await client
+        .read('AlphaPortal/v1/user-students/list')
+        .catch((e) => e as Error & { hint?: string });
+      expect(err.message).toMatch(/ALPHAPORTAL_REFRESH_TOKEN is not set/);
+      // The hint (rendered into the tool text by createMcpServer) names the
+      // console one-liner capture path.
+      expect(err.hint).toMatch(/localStorage\.user/);
+    } finally {
+      delete process.env.ALPHAPORTAL_DISABLE_FETCHPROXY;
+    }
+  });
+
+  it('bootstraps the refresh token from the browser bridge when none is configured', async () => {
+    const saved: string[] = [];
+    const io = { load: () => null, save: (_a: string, t: string) => saved.push(t), clear: () => {} };
+    // Injected bootstrap returns the pointer-extracted refresh token.
+    const bootstrapImpl = async () => ({
+      localStorage: { ALPHAPORTAL_REFRESH_TOKEN: jwt(FUTURE) },
+      missing: { localStorage: [] },
+    });
+    const client = new AlphaPortalClient({
+      sessionIO: io,
+      fetchImpl: makeFetch({ reads: { 'user-students/list': { students: [] } } }),
+      bootstrapImpl,
+    });
+    const data = await client.read<{ students: unknown[] }>('AlphaPortal/v1/user-students/list');
+    expect(data.students).toEqual([]);
+    expect(client.currentAuthSource()).toBe('browser-bootstrap');
+    // The bootstrapped token is persisted so later runs skip the bridge.
+    expect(saved.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('surfaces the underlying cause when the refresh fetch throws (reachability)', async () => {
+    const throwingFetch = (async () => {
+      throw Object.assign(new Error('fetch failed'), { cause: { code: 'ENOTFOUND' } });
+    }) as unknown as typeof fetch;
+    const client = new AlphaPortalClient({
+      refreshToken: jwt(FUTURE),
+      sessionIO: nullSessionIO,
+      fetchImpl: throwingFetch,
+    });
     await expect(client.read('AlphaPortal/v1/user-students/list')).rejects.toThrow(
-      /ALPHAPORTAL_REFRESH_TOKEN is not set/,
+      /could not reach https:\/\/api\.alpharoute\.app.*ENOTFOUND/,
     );
   });
 
