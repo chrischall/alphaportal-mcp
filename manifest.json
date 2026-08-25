@@ -32,9 +32,9 @@
   "user_config": {
     "alphaportal_refresh_token": {
       "type": "string",
-      "title": "AlphaPortal Refresh Token",
-      "description": "The refresh token from a signed-in AlphaPortal tab: in the DevTools console run JSON.parse(localStorage.user).User.RefreshToken",
-      "required": true,
+      "title": "AlphaPortal Refresh Token (optional)",
+      "description": "Optional. If left blank, the server reads it from a signed-in AlphaPortal tab via the Transporter (fetchproxy) extension. To set it manually, in that tab's DevTools console run: JSON.parse(localStorage.user).User.RefreshToken",
+      "required": false,
       "sensitive": true
     }
   },

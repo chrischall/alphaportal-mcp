@@ -28,27 +28,32 @@ notification preferences and walk-zone radius.
 - `alphaportal_edit_walk_radius` — set a student's walk-zone radius (meters)
 - `alphaportal_set_notification` — set per-student push/email notification preferences
 
-## Authentication — capture the refresh token once
+## Authentication — the refresh token
 
 AlphaPortal's login is reCAPTCHA-gated and can't be automated with a
 username/password. Instead this server uses the **refresh token** the web app
 stores in your signed-in browser (an 8-day credential); from it, it mints the
-short-lived access tokens it needs entirely server-side — **no browser
-extension or bridge at runtime**.
+short-lived access tokens it needs entirely server-side — **no browser bridge in
+the request hot path**. There are two ways it gets that token, tried in order:
 
-Capture it once:
-
-1. Sign in at `https://cmsnc.alphaportal.app/` (or your district's AlphaPortal host).
-2. Open DevTools → Console and run:
+1. **Automatic (fetchproxy bootstrap).** If `ALPHAPORTAL_REFRESH_TOKEN` is not
+   set, the server reads it once from your signed-in AlphaPortal tab via the
+   **Transporter** browser extension (the fetchproxy bridge) — a one-shot read
+   that snapshots only the token (a JSON-pointer extraction, so your name/email/
+   phone never leave the browser), then closes. Requires the extension installed
+   and a signed-in `*.alphaportal.app` tab. Set `ALPHAPORTAL_DISABLE_FETCHPROXY=1`
+   to turn this off.
+2. **Manual (env var).** Set `ALPHAPORTAL_REFRESH_TOKEN` yourself. Capture it in a
+   signed-in tab's DevTools console:
    ```js
    JSON.parse(localStorage.user).User.RefreshToken
    ```
-3. Copy the value into `ALPHAPORTAL_REFRESH_TOKEN` (see below).
+   This is the right path for a headless/hosted deployment with no browser.
 
-The server persists each rotated refresh token, so the 8-day window rolls
-forward as long as you use it at least once every 8 days. If it expires, repeat
-the capture. (The `alphaportal-fpx` skill under `skills/` documents an
-alternative one-line capture via the `fpx` browser bridge, if you have it.)
+Either way, the server persists each rotated refresh token, so the 8-day window
+rolls forward as long as you use it at least once every 8 days. If it expires,
+sign back in (path 1) or re-capture (path 2). The `alphaportal-fpx` skill under
+`skills/` documents the same capture from a shell via the `fpx` CLI.
 
 ## Setup
 
@@ -66,8 +71,18 @@ block (`.mcp.json` / mcpb user config both reference it).
 
 | Variable | Purpose |
 | --- | --- |
-| `ALPHAPORTAL_REFRESH_TOKEN` | The captured refresh token (required). |
+| `ALPHAPORTAL_REFRESH_TOKEN` | The refresh token. Optional if the fetchproxy bridge can read it from a signed-in tab; required for a headless/hosted deployment. |
+| `ALPHAPORTAL_DISABLE_FETCHPROXY` | Set to `1` to disable the browser-bridge fallback and require the env var. |
 | `ALPHAPORTAL_SESSION_FILE` | Override the store path (default `~/.alphaportal-mcp/session.json`). |
+
+### Hosting on mcp-host
+
+`mint.yaml` describes how to host this server. Note the **egress allowlist**: the
+only host the server contacts is `api.alpharoute.app` (every read/write and the
+token refresh). On the isolated tier an egress policy is required — allow
+`api.alpharoute.app`, or tools report "could not reach the API". A plain hosted
+registration has no browser bridge, so set `ALPHAPORTAL_REFRESH_TOKEN` as a
+secret there.
 
 ## Development
 

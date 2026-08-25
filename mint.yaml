@@ -9,7 +9,16 @@ env:
       The refresh token from a signed-in AlphaPortal browser tab. In the tab's
       DevTools console run: JSON.parse(localStorage.user).User.RefreshToken —
       it is an 8-day, reusable JWT, so re-capture and update this secret if it
-      expires.
+      expires. (Locally, if unset, the server can also read it from a signed-in
+      tab via the fetchproxy/Transporter bridge; a plain hosted registration has
+      no bridge, so set this secret.)
+egress:
+  allow:
+    # The AlphaRoute REST API — the ONLY host the server contacts. Every read,
+    # every write, and the token-refresh exchange
+    # (POST /AlphaCore/v1/public/refresh-token) go here. Without this on the
+    # isolated tier, fetch is blocked and tools report "could not reach the API".
+    - api.alpharoute.app
 state:
   dataDir: true
   reason: >-

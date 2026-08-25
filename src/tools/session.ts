@@ -3,42 +3,36 @@ import { textResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 
 /**
- * A credential-free health/status read: is a refresh token configured, and can
- * a fresh access token actually be minted? Never returns a token or any part of
- * one — only booleans and the profile's public name, so it is safe to call for
- * a "am I signed in?" check.
+ * A credential-free health/status read: can the server currently authenticate?
+ * It attempts a real profile read (which resolves the refresh token — from env,
+ * the store, or the browser bridge — and mints an access token). Never returns
+ * a token or any part of one; only booleans, how the token was obtained, and
+ * the profile's public name.
  */
 export function registerSessionTools(server: McpServer, client: AlphaPortalClient): void {
   server.registerTool(
     'alphaportal_session_status',
     {
       description:
-        'Check whether the server has a working AlphaPortal session: whether a refresh token is configured and whether it can currently mint an access token. Returns no credentials.',
+        'Check whether the server can authenticate to AlphaPortal: it resolves the refresh token (from ALPHAPORTAL_REFRESH_TOKEN, the saved session, or a signed-in browser tab via the bridge) and tries to mint an access token. Returns no credentials.',
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
     async () => {
-      if (!client.isConfigured()) {
-        return textResult({
-          configured: false,
-          authenticated: false,
-          note: 'No refresh token configured. Set ALPHAPORTAL_REFRESH_TOKEN (see README).',
-        });
-      }
       try {
         const profile = await client.read<{ Profile?: { UserName?: string; FullName?: string } }>(
           'AlphaCore/v1/user/profile',
           { method: 'POST', body: {} },
         );
         return textResult({
-          configured: true,
           authenticated: true,
+          authSource: client.currentAuthSource(),
           user: profile?.Profile?.UserName ?? profile?.Profile?.FullName ?? null,
         });
       } catch (err) {
         return textResult({
-          configured: true,
           authenticated: false,
+          hasStaticToken: client.hasStaticToken(),
           note: (err as Error).message,
         });
       }
