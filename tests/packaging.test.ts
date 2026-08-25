@@ -15,10 +15,14 @@ describe('packaging', () => {
     expect(pkg.repository?.url).toBe('git+https://github.com/chrischall/alphaportal-mcp.git');
   });
 
-  it('ships dist and skills in the published tarball', () => {
+  it('ships dist, skills, and mint.yaml in the published tarball', () => {
     expect(pkg.files).toContain('dist');
     expect(pkg.files).toContain('skills');
     expect(pkg.files).toContain('.claude-plugin');
+    // mint.yaml MUST ship on npm: mcp-host reads it from the tarball to fill
+    // the register wizard (egress etc.) for an npm-sourced registration.
+    // Omit it and the wizard comes up blank.
+    expect(pkg.files).toContain('mint.yaml');
   });
 
   it('exposes a single bin named for the package', () => {
