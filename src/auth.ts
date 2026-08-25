@@ -33,6 +33,19 @@ export interface RefreshResult {
 export type FetchLike = typeof fetch;
 
 /**
+ * The refresh token itself is dead (expired or revoked) — as opposed to a
+ * transient network/server failure. Callers use this to discard the persisted
+ * token and fall back to a fresh browser bootstrap; treating a 500 or a DNS
+ * error the same way would throw away a perfectly good credential.
+ */
+export class RefreshTokenRejectedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'RefreshTokenRejectedError';
+  }
+}
+
+/**
  * Exchange a refresh token for a fresh token pair.
  *
  * Throws a plain `Error` on a non-2xx or malformed response; the caller
@@ -62,14 +75,16 @@ export async function refreshAccessToken(
 
   const text = await res.text();
   if (!res.ok) {
-    // 401 here means the refresh token is expired or invalid — the user must
-    // re-capture it from a signed-in browser tab.
-    throw new Error(
-      res.status === 401
-        ? 'AlphaPortal refresh token is expired or invalid — re-capture it from a signed-in ' +
-          'cmsnc.alphaportal.app tab (see README) and update ALPHAPORTAL_REFRESH_TOKEN.'
-        : `AlphaPortal token refresh failed (HTTP ${res.status}).`,
-    );
+    // 401 means the refresh token itself is dead. Typed so the caller can
+    // discard the persisted copy and re-bootstrap; any other status is a
+    // transient failure and must NOT cost the user their stored credential.
+    if (res.status === 401) {
+      throw new RefreshTokenRejectedError(
+        'AlphaPortal refresh token is expired or invalid — sign in again at your AlphaPortal ' +
+          'host so it can be re-read, or re-capture it and update ALPHAPORTAL_REFRESH_TOKEN.',
+      );
+    }
+    throw new Error(`AlphaPortal token refresh failed (HTTP ${res.status}).`);
   }
 
   let parsed: { success?: boolean; data?: Partial<RefreshResult>; message?: string };

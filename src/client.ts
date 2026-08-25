@@ -32,7 +32,12 @@ import {
   type ApiClient,
 } from '@chrischall/mcp-utils';
 import { TokenManager } from '@chrischall/mcp-utils/session';
-import { refreshAccessToken, refreshTokenExpiryMs, type FetchLike } from './auth.js';
+import {
+  RefreshTokenRejectedError,
+  refreshAccessToken,
+  refreshTokenExpiryMs,
+  type FetchLike,
+} from './auth.js';
 import { BootstrapError, bootstrapDisabled, bootstrapRefreshToken, type BootstrapFn } from './bootstrap.js';
 import { BASE_URL } from './endpoints.js';
 import { DEFAULT_ACCOUNT_KEY, diskSessionIO, type SessionIO } from './session.js';
@@ -110,17 +115,56 @@ export class AlphaPortalClient {
     return this.authSource;
   }
 
-  /** Pick the freshest refresh token among injected / env / persisted store (no bridge). */
+  /**
+   * Pick the best usable refresh token among injected / env / persisted store
+   * (no bridge). Returns `null` when none is usable, so the caller can fall
+   * through to the browser bootstrap.
+   *
+   * Expiry FILTERS as well as ranks. Ranking alone was a real bug: a stale
+   * persisted token is still "the freshest candidate" when it is the only one,
+   * so it permanently shadowed the bootstrap fallback and the documented "sign
+   * back in" recovery could never run. A token whose `exp` has passed cannot
+   * work, so it is dropped outright.
+   *
+   * A token we cannot DECODE is kept (ranked last, since its expiry reads as
+   * 0): we can't prove it is bad, it may well be valid, and a headless
+   * deployment with no bridge has nothing else to try. If it really is dead the
+   * refresh 401s and {@link handleRefreshFailure} discards it then.
+   */
   private resolveStaticRefreshToken(): string | null {
+    const now = Date.now();
     const candidates = [
       this.opts.refreshToken,
       readEnvVar('ALPHAPORTAL_REFRESH_TOKEN'),
       this.sessionIO.load(this.accountId) ?? undefined,
-    ].filter((t): t is string => typeof t === 'string' && t.length > 0);
+    ]
+      .filter((t): t is string => typeof t === 'string' && t.length > 0)
+      // Drop only tokens we can decode AND that have already expired; an
+      // undecodable one reads as 0 and is kept as a last resort.
+      .filter((t) => {
+        const exp = refreshTokenExpiryMs(t);
+        return exp === 0 || exp > now;
+      });
     if (candidates.length === 0) return null;
     return candidates.reduce((best, cur) =>
       refreshTokenExpiryMs(cur) > refreshTokenExpiryMs(best) ? cur : best,
     );
+  }
+
+  /**
+   * A refresh attempt failed. When the token was REJECTED (401) it is dead:
+   * discard the persisted copy and drop the cached API client so the very next
+   * tool call re-resolves from scratch — which, with no usable static token
+   * left, re-runs the browser bootstrap. That pair is what makes the "sign back
+   * in and retry" path in the README actually work.
+   *
+   * A transient failure (5xx, DNS, timeout) is left alone: the stored token is
+   * still good and throwing it away would force a needless re-capture.
+   */
+  private handleRefreshFailure(err: unknown): void {
+    if (!(err instanceof RefreshTokenRejectedError)) return;
+    this.sessionIO.clear(this.accountId);
+    this.apiPromise = undefined;
   }
 
   /** Resolve the refresh token, falling back to the browser bridge, then a helpful error. */
@@ -168,7 +212,15 @@ export class AlphaPortalClient {
         // Seeded already-expired so the first request mints lazily.
         initial: { accessToken: '', refreshToken: token, expiresAt: 0 },
         refresh: async (rt) => {
-          const result = await refreshAccessToken(rt, this.fetchImpl);
+          let result;
+          try {
+            result = await refreshAccessToken(rt, this.fetchImpl);
+          } catch (err) {
+            // A rejected (401) token is dead: discard it and reset, so the next
+            // call re-resolves and can bootstrap from the browser again.
+            this.handleRefreshFailure(err);
+            throw err;
+          }
           this.sessionIO.save(this.accountId, result.refreshToken);
           return {
             accessToken: result.token,

@@ -102,6 +102,79 @@ describe('AlphaPortalClient auth + envelope', () => {
     expect(saved.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('an EXPIRED persisted token does not shadow the browser bootstrap', async () => {
+    // The regression the auto-review caught: expiry used to only RANK
+    // candidates, so a stale stored token won by default and the bootstrap
+    // fallback could never run.
+    const expired = jwt(Math.floor(Date.now() / 1000) - 60);
+    const io = { load: () => expired, save: () => {}, clear: () => {} };
+    let bootstrapped = false;
+    const client = new AlphaPortalClient({
+      sessionIO: io,
+      fetchImpl: makeFetch({ reads: { 'user-students/list': { students: [] } } }),
+      bootstrapImpl: async () => {
+        bootstrapped = true;
+        return { localStorage: { ALPHAPORTAL_REFRESH_TOKEN: jwt(FUTURE) }, missing: { localStorage: [] } };
+      },
+    });
+    await client.read('AlphaPortal/v1/user-students/list');
+    expect(bootstrapped).toBe(true);
+    expect(client.currentAuthSource()).toBe('browser-bootstrap');
+  });
+
+  it('a REJECTED refresh token is cleared, so the next call re-bootstraps', async () => {
+    // Outcome under test: the README's "sign back in and retry" recovery.
+    let stored: string | null = jwt(FUTURE); // decodable + unexpired, but dead server-side
+    const io = {
+      load: () => stored,
+      save: (_a: string, t: string) => { stored = t; },
+      clear: () => { stored = null; },
+    };
+    let bootstrapCalls = 0;
+    let rejectRefresh = true;
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/public/refresh-token')) {
+        if (rejectRefresh) return res(401, { success: false, message: 'Invalid user!' });
+        return res(200, { success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } });
+      }
+      return res(200, { success: true, data: { students: [] } });
+    }) as unknown as typeof fetch;
+    const client = new AlphaPortalClient({
+      sessionIO: io,
+      fetchImpl,
+      bootstrapImpl: async () => {
+        bootstrapCalls += 1;
+        return { localStorage: { ALPHAPORTAL_REFRESH_TOKEN: jwt(FUTURE) }, missing: { localStorage: [] } };
+      },
+    });
+
+    // First call: the stored token is rejected → it must be discarded.
+    await expect(client.read('AlphaPortal/v1/user-students/list')).rejects.toThrow();
+    expect(stored, 'a rejected refresh token must not stay persisted').toBeNull();
+
+    // The user signs back in; the next call recovers via the bridge.
+    rejectRefresh = false;
+    const data = await client.read<{ students: unknown[] }>('AlphaPortal/v1/user-students/list');
+    expect(data.students).toEqual([]);
+    expect(bootstrapCalls).toBe(1);
+  });
+
+  it('a TRANSIENT refresh failure keeps the stored token (does not force re-capture)', async () => {
+    let stored: string | null = jwt(FUTURE);
+    const io = {
+      load: () => stored,
+      save: (_a: string, t: string) => { stored = t; },
+      clear: () => { stored = null; },
+    };
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/public/refresh-token')) return res(503, { success: false });
+      return res(200, { success: true, data: {} });
+    }) as unknown as typeof fetch;
+    const client = new AlphaPortalClient({ sessionIO: io, fetchImpl });
+    await expect(client.read('AlphaPortal/v1/user-students/list')).rejects.toThrow(/HTTP 503/);
+    expect(stored, 'a 5xx must not cost the user their credential').not.toBeNull();
+  });
+
   it('surfaces the underlying cause when the refresh fetch throws (reachability)', async () => {
     const throwingFetch = (async () => {
       throw Object.assign(new Error('fetch failed'), { cause: { code: 'ENOTFOUND' } });

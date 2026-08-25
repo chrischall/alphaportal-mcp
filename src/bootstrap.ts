@@ -93,9 +93,18 @@ export async function bootstrapRefreshToken(bootstrapImpl?: BootstrapFn): Promis
 
   const token = session.localStorage[OUTPUT_KEY];
   if (!token) {
+    // `missing` reports DECLARED storage keys the browser did not return, so it
+    // separates two failures that otherwise look identical. The key itself
+    // absent means there is no signed-in session to read; the key present but
+    // the pointer unresolved means the app's storage shape changed.
+    const keyMissing = session.missing?.localStorage?.includes(STORAGE_KEY) ?? false;
     throw new BootstrapError(
-      'The AlphaPortal tab did not return a refresh token (localStorage.user./User/RefreshToken was empty).',
-      'Open and sign into https://cmsnc.alphaportal.app/ (your district subdomain) in the browser with the Transporter extension, then retry.',
+      keyMissing
+        ? `The AlphaPortal tab has no "${STORAGE_KEY}" in localStorage — it does not look signed in.`
+        : `The AlphaPortal tab returned "${STORAGE_KEY}" but ${REFRESH_POINTER} did not resolve — the app's stored session shape may have changed.`,
+      keyMissing
+        ? 'Open and sign into your AlphaPortal host (e.g. https://cmsnc.alphaportal.app/) in the browser with the Transporter extension, then retry.'
+        : `Check the value in that tab's console: JSON.parse(localStorage.user).User.RefreshToken — and set ALPHAPORTAL_REFRESH_TOKEN manually if the shape has moved.`,
     );
   }
   return token;

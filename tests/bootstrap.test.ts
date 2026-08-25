@@ -25,13 +25,25 @@ describe('bootstrapRefreshToken', () => {
     ]);
   });
 
-  it('throws an actionable BootstrapError when the tab returns nothing', async () => {
-    await expect(
-      bootstrapRefreshToken(async () => ({ localStorage: {}, missing: { localStorage: ['user'] } })),
-    ).rejects.toThrow(BootstrapError);
-    await expect(
-      bootstrapRefreshToken(async () => ({ localStorage: {}, missing: { localStorage: ['user'] } })),
-    ).rejects.toThrow(/did not return a refresh token/);
+  it('distinguishes "not signed in" (declared key missing) from a bad pointer', async () => {
+    // `missing` names declared keys the browser did not return, so the two
+    // failures get different remedies instead of one vague message.
+    const notSignedIn = await bootstrapRefreshToken(async () => ({
+      localStorage: {},
+      missing: { localStorage: ['user'] },
+    })).catch((e) => e as BootstrapError);
+    expect(notSignedIn).toBeInstanceOf(BootstrapError);
+    expect(notSignedIn.message).toMatch(/does not look signed in/);
+    expect(notSignedIn.hint).toMatch(/sign into/i);
+
+    // Key WAS returned, but the pointer did not resolve → storage shape moved.
+    const badPointer = await bootstrapRefreshToken(async () => ({
+      localStorage: {},
+      missing: { localStorage: [] },
+    })).catch((e) => e as BootstrapError);
+    expect(badPointer).toBeInstanceOf(BootstrapError);
+    expect(badPointer.message).toMatch(/did not resolve/);
+    expect(badPointer.message).toMatch(/User\/RefreshToken/);
   });
 
   it('preserves a bridge hint (e.g. bridge down) on the error', async () => {
