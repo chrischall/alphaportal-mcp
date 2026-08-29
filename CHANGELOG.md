@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.1.0...v0.2.0) (2026-08-29)
+
+
+### Features
+
+* **deps:** take @fetchproxy/server 2.2.0 so the concentrator can bind its sandbox address ([#5](https://github.com/chrischall/alphaportal-mcp/issues/5)) ([6a98333](https://github.com/chrischall/alphaportal-mcp/commit/6a983331ca103d5387c256d713ae7d3b3b4d6818))
+
 ## 0.1.0 (2026-08-26)
 
 

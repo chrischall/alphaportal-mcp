@@ -3,7 +3,7 @@
   "manifest_version": "0.3",
   "name": "alphaportal-mcp",
   "display_name": "AlphaPortal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AlphaPortal school-bus transportation for Claude — students, stops, live bus location, and arrival notifications via natural language",
   "author": {
     "name": "Chris Chall",
