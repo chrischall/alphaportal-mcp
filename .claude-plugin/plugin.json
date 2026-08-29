@@ -1,7 +1,7 @@
 {
   "name": "alphaportal-mcp",
   "displayName": "AlphaPortal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for AlphaPortal (AlphaRoute) school-bus transportation — students, stops, live bus location, and notifications",
   "author": {
     "name": "Chris Hall",
