@@ -12,6 +12,11 @@ env:
       expires. (Locally, if unset, the server can also read it from a signed-in
       tab via the fetchproxy/Transporter bridge; a plain hosted registration has
       no bridge, so set this secret.)
+  - name: ALPHAPORTAL_DISABLE_FETCHPROXY
+    required: false
+    help: >-
+      Set to true to skip the browser-bridge fallback entirely and use only a
+      supplied refresh token. Defaults to false, i.e. the fallback is attempted.
 egress:
   allow:
     # The AlphaRoute REST API — the ONLY host the server contacts. Every read,
