@@ -15,8 +15,8 @@ env:
   - name: ALPHAPORTAL_DISABLE_FETCHPROXY
     required: false
     help: >-
-      Set to true to skip the browser-bridge fallback entirely and use only a
-      supplied refresh token. Defaults to false, i.e. the fallback is attempted.
+      Set to 1 to skip the browser-bridge fallback entirely and require
+      ALPHAPORTAL_REFRESH_TOKEN. Unset, the fallback is attempted.
 egress:
   allow:
     # The AlphaRoute REST API — the ONLY host the server contacts. Every read,
