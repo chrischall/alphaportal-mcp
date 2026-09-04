@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult } from '@chrischall/mcp-utils';
+import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 
 /**
@@ -24,13 +24,13 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
           'AlphaCore/v1/user/profile',
           { method: 'POST', body: {} },
         );
-        return textResult({
+        return minifiedResult({
           authenticated: true,
           authSource: client.currentAuthSource(),
           user: profile?.Profile?.UserName ?? profile?.Profile?.FullName ?? null,
         });
       } catch (err) {
-        return textResult({
+        return minifiedResult({
           authenticated: false,
           hasStaticToken: client.hasStaticToken(),
           note: (err as Error).message,

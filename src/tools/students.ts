@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult } from '@chrischall/mcp-utils';
+import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
 
@@ -23,7 +23,7 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.studentList)),
+    async () => minifiedResult(await client.read(READ.studentList)),
   );
 
   server.registerTool(
@@ -35,7 +35,7 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
       inputSchema: { studentId: studentIdSchema },
     },
     async ({ studentId }) =>
-      textResult(await client.read(READ.studentRetrieve, { pathSuffix: `/${studentId}` })),
+      minifiedResult(await client.read(READ.studentRetrieve, { pathSuffix: `/${studentId}` })),
   );
 
   server.registerTool(
@@ -47,7 +47,7 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
       inputSchema: { studentId: studentIdSchema },
     },
     async ({ studentId }) =>
-      textResult(await client.read(READ.studentStops, { pathSuffix: `/${studentId}` })),
+      minifiedResult(await client.read(READ.studentStops, { pathSuffix: `/${studentId}` })),
   );
 
   server.registerTool(
@@ -60,7 +60,7 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
     },
     async ({ studentId, shift }) => {
       const shiftCode = shift === 'PM' ? 1 : 0;
-      return textResult(
+      return minifiedResult(
         await client.read(READ.vehicleLocation, { pathSuffix: `/${studentId}/${shiftCode}` }),
       );
     },
@@ -75,6 +75,6 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
       inputSchema: { studentId: studentIdSchema },
     },
     async ({ studentId }) =>
-      textResult(await client.read(READ.reportsBulk, { query: { studentId } })),
+      minifiedResult(await client.read(READ.reportsBulk, { query: { studentId } })),
   );
 }

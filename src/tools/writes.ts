@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult } from '@chrischall/mcp-utils';
+import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { WRITE } from '../endpoints.js';
 import { previewUnlessConfirmed, schemaConfirm } from './_confirm.js';
@@ -80,7 +80,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
         body,
       );
       if (preview) return preview;
-      return textResult(await client.write(WRITE.radiusEdit, body));
+      return minifiedResult(await client.write(WRITE.radiusEdit, body));
     },
   );
 
@@ -118,7 +118,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
         body,
       );
       if (preview) return preview;
-      return textResult(await client.write(WRITE.setNotification, body));
+      return minifiedResult(await client.write(WRITE.setNotification, body));
     },
   );
 }

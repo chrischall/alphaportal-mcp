@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult } from '@chrischall/mcp-utils';
+import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
 
@@ -16,7 +16,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.profile, { method: 'POST', body: {} })),
+    async () => minifiedResult(await client.read(READ.profile, { method: 'POST', body: {} })),
   );
 
   server.registerTool(
@@ -32,7 +32,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
         client.read(READ.accountInfo),
         client.read(READ.accountDate),
       ]);
-      return textResult({ account, date });
+      return minifiedResult({ account, date });
     },
   );
 
@@ -44,7 +44,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.applicationSetting)),
+    async () => minifiedResult(await client.read(READ.applicationSetting)),
   );
 
   server.registerTool(
@@ -55,7 +55,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.schoolLightList)),
+    async () => minifiedResult(await client.read(READ.schoolLightList)),
   );
 
   server.registerTool(
@@ -65,7 +65,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.gradeList)),
+    async () => minifiedResult(await client.read(READ.gradeList)),
   );
 
   server.registerTool(
@@ -76,6 +76,6 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.requestList)),
+    async () => minifiedResult(await client.read(READ.requestList)),
   );
 }
