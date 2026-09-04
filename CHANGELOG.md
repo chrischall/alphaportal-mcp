@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.2.0...v0.3.0) (2026-09-04)
+
+
+### Features
+
+* **tools:** compact by default — strip media URLs, and minify every response ([#22](https://github.com/chrischall/alphaportal-mcp/issues/22)) ([d9ca202](https://github.com/chrischall/alphaportal-mcp/commit/d9ca2021bd4e21ee129a6b8f114db1ad80fb8f4a))
+
+
+### Documentation
+
+* **mint:** declare ALPHAPORTAL_DISABLE_FETCHPROXY in mint.yaml ([#12](https://github.com/chrischall/alphaportal-mcp/issues/12)) ([19cdc02](https://github.com/chrischall/alphaportal-mcp/commit/19cdc02aa835c7f7bfce872209e8ef5c78758cf2))
+* **mint:** match the README's format for ALPHAPORTAL_DISABLE_FETCHPROXY ([#17](https://github.com/chrischall/alphaportal-mcp/issues/17)) ([6608644](https://github.com/chrischall/alphaportal-mcp/commit/660864498666bf87a6860a8eb2f59fd8af46e9f8))
+
 ## [0.2.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.1.0...v0.2.0) (2026-08-29)
 
 

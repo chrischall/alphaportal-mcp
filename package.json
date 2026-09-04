@@ -1,6 +1,6 @@
 {
   "name": "alphaportal-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "mcpName": "io.github.chrischall/alphaportal-mcp",
   "description": "AlphaPortal (AlphaRoute) school-bus MCP server for Claude — developed and maintained by AI",
   "author": "Claude Code (AI) <https://www.anthropic.com/claude>",
