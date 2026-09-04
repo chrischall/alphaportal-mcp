@@ -5,7 +5,7 @@
 
 ### Features
 
-* **tools:** compact by default — strip media URLs, and minify every response ([#22](https://github.com/chrischall/alphaportal-mcp/issues/22)) ([d9ca202](https://github.com/chrischall/alphaportal-mcp/commit/d9ca2021bd4e21ee129a6b8f114db1ad80fb8f4a))
+* **tools:** minify every response — no formatting whitespace on any payload ([#22](https://github.com/chrischall/alphaportal-mcp/issues/22)) ([d9ca202](https://github.com/chrischall/alphaportal-mcp/commit/d9ca2021bd4e21ee129a6b8f114db1ad80fb8f4a))
 
 
 ### Documentation
