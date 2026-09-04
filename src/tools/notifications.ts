@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { textResult } from '@chrischall/mcp-utils';
+import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
 
@@ -12,6 +12,6 @@ export function registerNotificationTools(server: McpServer, client: AlphaPortal
       annotations: { readOnlyHint: true },
       inputSchema: {},
     },
-    async () => textResult(await client.read(READ.notificationsList)),
+    async () => minifiedResult(await client.read(READ.notificationsList)),
   );
 }

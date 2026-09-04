@@ -2,7 +2,7 @@
   "name": "alphaportal-mcp",
   "version": "0.2.0",
   "mcpName": "io.github.chrischall/alphaportal-mcp",
-  "description": "AlphaPortal (AlphaRoute) school-bus MCP server for Claude — developed and maintained by AI",
+  "description": "AlphaPortal (AlphaRoute) school-bus MCP server for Claude \u2014 developed and maintained by AI",
   "author": "Claude Code (AI) <https://www.anthropic.com/claude>",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "test:coverage": "npm run typecheck && vitest run --coverage"
   },
   "dependencies": {
-    "@chrischall/mcp-utils": "^0.18.1",
+    "@chrischall/mcp-utils": "^0.23.0",
     "@fetchproxy/bootstrap": "^2.2.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^17.4.0",
