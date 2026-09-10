@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.0...v0.3.1) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** @chrischall/mcp-utils 0.26.1 ([#33](https://github.com/chrischall/alphaportal-mcp/issues/33)) ([66b7f61](https://github.com/chrischall/alphaportal-mcp/commit/66b7f61a826dff9e112b5f1ad1ad8008dcbc1c57))
+* **deps:** bump hono from 4.13.4 to 4.13.7 ([#31](https://github.com/chrischall/alphaportal-mcp/issues/31)) ([3aa5a1b](https://github.com/chrischall/alphaportal-mcp/commit/3aa5a1bbd6c410d8eb181f708b01c52d31df51e6))
+* **deps:** declare the peer floors mcp-utils 0.26.1 requires ([#34](https://github.com/chrischall/alphaportal-mcp/issues/34)) ([0355c08](https://github.com/chrischall/alphaportal-mcp/commit/0355c08d64045a136e86af54306a5aff817af425))
+
 ## [0.3.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.2.0...v0.3.0) (2026-09-04)
 
 
