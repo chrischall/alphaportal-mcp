@@ -43,7 +43,7 @@
     "test:coverage": "npm run typecheck && vitest run --coverage"
   },
   "dependencies": {
-    "@chrischall/mcp-utils": "^0.26.1",
+    "@chrischall/mcp-utils": "^0.27.1",
     "@fetchproxy/bootstrap": "^2.2.0",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "dotenv": "^17.4.0",
