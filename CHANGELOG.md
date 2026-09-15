@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.1...v0.3.2) (2026-09-15)
+
+
+### Bug Fixes
+
+* **deps:** @fetchproxy/server 3.0.1 — capped peer frames, logged load drops, atomic identity writes ([#39](https://github.com/chrischall/alphaportal-mcp/issues/39)) ([7fe0148](https://github.com/chrischall/alphaportal-mcp/commit/7fe0148d065ae2c635f1f9ae5459a4b102978acc))
+* **deps:** bump the production-dependencies group with 3 updates ([21be221](https://github.com/chrischall/alphaportal-mcp/commit/21be2214fbb8bc0db7dbb28b577a353b0573e0ff))
+
 ## [0.3.1](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.0...v0.3.1) (2026-09-10)
 
 
