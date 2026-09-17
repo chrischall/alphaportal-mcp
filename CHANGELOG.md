@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.2...v0.4.0) (2026-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mcp:** migrate server to SDK v2 ([#41](https://github.com/chrischall/alphaportal-mcp/issues/41))
+
+### Features
+
+* **mcp:** migrate server to SDK v2 ([#41](https://github.com/chrischall/alphaportal-mcp/issues/41)) ([62fa75d](https://github.com/chrischall/alphaportal-mcp/commit/62fa75da7a5bfdd6356c04efa305527abec8bcd9))
+
+
+### Bug Fixes
+
+* **build:** preserve Zod initialization in standalone bundle ([#44](https://github.com/chrischall/alphaportal-mcp/issues/44)) ([2ce3851](https://github.com/chrischall/alphaportal-mcp/commit/2ce3851501ab18f3e6ec1af9ef7576cb68db1492))
+* **mcp:** address SDK v2 review follow-up ([#45](https://github.com/chrischall/alphaportal-mcp/issues/45)) ([6d68171](https://github.com/chrischall/alphaportal-mcp/commit/6d68171e628b6684ba8446faf3f2ef62ea154bb4))
+
 ## [0.3.2](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.1...v0.3.2) (2026-09-15)
 
 
