@@ -1,7 +1,8 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
+import { z } from "zod";
 
 export function registerNotificationTools(server: McpServer, client: AlphaPortalClient): void {
   server.registerTool(
@@ -10,7 +11,7 @@ export function registerNotificationTools(server: McpServer, client: AlphaPortal
       description:
         'List the account\'s transportation notifications — arrival/departure alerts (e.g. "arrived at school") with title, body, the student, and timestamp.',
       annotations: { readOnlyHint: true },
-      inputSchema: {},
+      inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.notificationsList)),
   );

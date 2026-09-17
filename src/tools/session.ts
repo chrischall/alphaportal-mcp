@@ -1,6 +1,7 @@
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
+import { z } from "zod";
 
 /**
  * A credential-free health/status read: can the server currently authenticate?
@@ -16,7 +17,7 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
       description:
         'Check whether the server can authenticate to AlphaPortal: it resolves the refresh token (from ALPHAPORTAL_REFRESH_TOKEN, the saved session, or a signed-in browser tab via the bridge) and tries to mint an access token. Returns no credentials.',
       annotations: { readOnlyHint: true },
-      inputSchema: {},
+      inputSchema: z.object({}),
     },
     async () => {
       try {
