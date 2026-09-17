@@ -2,7 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
-import { z } from "zod";
+import { z } from 'zod';
 
 /**
  * Account-level and district-reference reads: the signed-in profile, account
