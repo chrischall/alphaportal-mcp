@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
-import { z } from "zod";
+import { z } from 'zod';
 
 /**
  * A credential-free health/status read: can the server currently authenticate?
