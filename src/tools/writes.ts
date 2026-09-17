@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import { minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { WRITE } from '../endpoints.js';
@@ -60,7 +60,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       description:
         "Set a student's walk-zone radius, in meters. This can affect transportation eligibility, so it is confirm-gated: without confirm:true it returns a dry-run of the exact payload. Verified required fields: studentId, radius.",
       annotations: { readOnlyHint: false, destructiveHint: true },
-      inputSchema: {
+      inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
         radiusMeters: z
           .number()
@@ -68,7 +68,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
           .nonnegative()
           .describe('Walk-zone radius in meters (the API stores the base-unit distance).'),
         confirm: schemaConfirm,
-      },
+      }),
     },
     async ({ studentId, radiusMeters, confirm }) => {
       const body = { studentId, radius: radiusMeters };
@@ -90,7 +90,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       description:
         "Set a student's transportation notification preferences (push/email, per AM/PM run) across the categories the district enables: stopRadiusEntry, studentScan, backupBus, schoolArrival, stopServiced. Confirm-gated: without confirm:true it returns a dry-run of the exact payload. NOTE: the portal sends the whole preference set at once; categories you omit may be left unchanged or reset by the server — review the dry-run first.",
       annotations: { readOnlyHint: false, destructiveHint: false },
-      inputSchema: {
+      inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
         studentOriginalId: z
           .string()
@@ -106,7 +106,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
           })
           .describe('Per-category push/email toggles.'),
         confirm: schemaConfirm,
-      },
+      }),
     },
     async ({ studentId, studentOriginalId, preferences, confirm }) => {
       const body = buildNotificationBody({ studentId, studentOriginalId, preferences });
