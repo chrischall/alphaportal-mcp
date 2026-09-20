@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.4.0...v1.0.0) (2026-09-20)
+
+
+### Features
+
+* **deps:** take mcp-utils 1.0.0, so this server negotiates the 2026 era ([#46](https://github.com/chrischall/alphaportal-mcp/issues/46)) ([89a6e6f](https://github.com/chrischall/alphaportal-mcp/commit/89a6e6facf1ebd7d42eab6940eefba6fc1a3b237))
+
+
+### Bug Fixes
+
+* **release:** drop bump-minor-pre-major so a breaking change cuts a major ([#48](https://github.com/chrischall/alphaportal-mcp/issues/48)) ([6ca3663](https://github.com/chrischall/alphaportal-mcp/commit/6ca366382fb06d3f9fe23c377ebcf4d4f4c82e09))
+* **release:** restate the Release-As footer the squash dropped ([#49](https://github.com/chrischall/alphaportal-mcp/issues/49)) ([b3a40ad](https://github.com/chrischall/alphaportal-mcp/commit/b3a40adc7ce14d19771a17b83cd548ee73188e31))
+
 ## [0.4.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.3.2...v0.4.0) (2026-09-17)
 
 
