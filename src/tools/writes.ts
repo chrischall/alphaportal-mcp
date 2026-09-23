@@ -89,7 +89,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
     {
       description:
         "Set a student's transportation notification preferences (push/email, per AM/PM run) across the categories the district enables: stopRadiusEntry, studentScan, backupBus, schoolArrival, stopServiced. Confirm-gated: without confirm:true it returns a dry-run of the exact payload. NOTE: the portal sends the whole preference set at once; categories you omit may be left unchanged or reset by the server — review the dry-run first.",
-      annotations: { readOnlyHint: false, destructiveHint: false },
+      annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
         studentOriginalId: z

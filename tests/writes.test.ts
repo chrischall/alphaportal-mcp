@@ -85,6 +85,21 @@ describe('write tools confirm gate', () => {
     await harness.close();
   });
 
+  it('set_notification is annotated destructive + idempotent (fleet-audit#44)', async () => {
+    // A partial body can reset the categories it omits (e.g. turn off a
+    // child's schoolArrival alerts), and confirm:true is model-controlled, so
+    // the annotation is the host-side safeguard.
+    const { harness } = await harnessWithMock();
+    const { tools } = await harness.client.listTools();
+    const tool = tools.find((t) => t.name === 'alphaportal_set_notification');
+    expect(tool?.annotations).toMatchObject({
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+    });
+    await harness.close();
+  });
+
   it('set_notification dry-run shows the flattened body', async () => {
     const { harness } = await harnessWithMock();
     const result = await harness.callTool('alphaportal_set_notification', {
