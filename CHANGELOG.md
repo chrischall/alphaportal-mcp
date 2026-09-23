@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.0...v1.0.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv from 17.4.2 to 18.0.1 ([#53](https://github.com/chrischall/alphaportal-mcp/issues/53)) ([13b3d7f](https://github.com/chrischall/alphaportal-mcp/commit/13b3d7f7363e530e6399af5f3ad145d54288dce8))
+* **deps:** bump zod from 4.6.2 to 4.6.5 in the production-dependencies group ([23d9ccd](https://github.com/chrischall/alphaportal-mcp/commit/23d9ccd654795886b4ded9927061f4190f83c695))
+* **deps:** require zod ^4.6.5 to match @chrischall/mcp-utils 2.4.0 ([#56](https://github.com/chrischall/alphaportal-mcp/issues/56)) ([504ec6c](https://github.com/chrischall/alphaportal-mcp/commit/504ec6ccbd391445da641d81abf352afc6f8afe2))
+* **deps:** upgrade @chrischall/mcp-utils to 2.4.0 and @fetchproxy/* to 3.2.0 ([#55](https://github.com/chrischall/alphaportal-mcp/issues/55)) ([f18db64](https://github.com/chrischall/alphaportal-mcp/commit/f18db6462c947d7cf191329f01c170f1e5b11c8c))
+
 ## [1.0.0](https://github.com/chrischall/alphaportal-mcp/compare/v0.4.0...v1.0.0) (2026-09-20)
 
 
