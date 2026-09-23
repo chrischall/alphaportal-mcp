@@ -97,6 +97,13 @@ export class AlphaPortalClient {
   /** Single-flight auth setup; resolves to the ready API client. */
   private apiPromise: Promise<ApiClient> | undefined;
   private authSource: AuthSource | undefined;
+  /**
+   * Refresh tokens the server has REJECTED (401) in this process. The store
+   * copy is cleared on rejection, but an env / injected token cannot be — and a
+   * revoked token still decodes as unexpired for up to 8 days — so without this
+   * it would be re-selected on every call and the bootstrap would never run.
+   */
+  private readonly rejectedTokens = new Set<string>();
 
   constructor(opts: AlphaPortalClientOptions = {}) {
     this.opts = opts;
@@ -139,6 +146,8 @@ export class AlphaPortalClient {
       this.sessionIO.load(this.accountId) ?? undefined,
     ]
       .filter((t): t is string => typeof t === 'string' && t.length > 0)
+      // A token the server already rejected is dead whatever its `exp` says.
+      .filter((t) => !this.rejectedTokens.has(t))
       // Drop only tokens we can decode AND that have already expired; an
       // undecodable one reads as 0 and is kept as a last resort.
       .filter((t) => {
@@ -158,11 +167,15 @@ export class AlphaPortalClient {
    * left, re-runs the browser bootstrap. That pair is what makes the "sign back
    * in and retry" path in the README actually work.
    *
+   * The rejected token is also remembered, so an env / injected copy of it
+   * (which cannot be cleared) is filtered out too.
+   *
    * A transient failure (5xx, DNS, timeout) is left alone: the stored token is
    * still good and throwing it away would force a needless re-capture.
    */
-  private handleRefreshFailure(err: unknown): void {
+  private handleRefreshFailure(err: unknown, rejectedToken: string): void {
     if (!(err instanceof RefreshTokenRejectedError)) return;
+    this.rejectedTokens.add(rejectedToken);
     this.sessionIO.clear(this.accountId);
     this.apiPromise = undefined;
   }
@@ -218,7 +231,7 @@ export class AlphaPortalClient {
           } catch (err) {
             // A rejected (401) token is dead: discard it and reset, so the next
             // call re-resolves and can bootstrap from the browser again.
-            this.handleRefreshFailure(err);
+            this.handleRefreshFailure(err, rt);
             throw err;
           }
           this.sessionIO.save(this.accountId, result.refreshToken);

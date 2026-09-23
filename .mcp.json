@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "alphaportal": {
-      "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "alphaportal-mcp"],
       "env": {
         "ALPHAPORTAL_REFRESH_TOKEN": "${ALPHAPORTAL_REFRESH_TOKEN}"
       }

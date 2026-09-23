@@ -41,6 +41,19 @@ describe('packaging', () => {
     expect(hosts).toContain(new URL(BASE_URL).host);
   });
 
+  it('the Claude plugin launches the published package, not the gitignored dist/', () => {
+    // fleet-audit#43: a plugin installed from this git repo (marketplace source
+    // "./") has no dist/ and no node_modules — dist/ is gitignored — so a
+    // `node ${CLAUDE_PLUGIN_ROOT}/dist/...` launch fails with "Cannot find
+    // module". Running the npm package via npx is self-contained.
+    const server = read('.mcp.json').mcpServers.alphaportal;
+    expect(server.command).toBe('npx');
+    expect(server.args).toEqual(['-y', pkg.name]);
+    expect(JSON.stringify(server)).not.toMatch(/dist\//);
+    // The env passthrough must survive the switch.
+    expect(server.env.ALPHAPORTAL_REFRESH_TOKEN).toBe('${ALPHAPORTAL_REFRESH_TOKEN}');
+  });
+
   it('server.json description is within the 100-char registry limit', () => {
     const server = read('server.json');
     expect(server.description.length).toBeLessThanOrEqual(100);

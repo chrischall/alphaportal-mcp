@@ -159,6 +159,57 @@ describe('AlphaPortalClient auth + envelope', () => {
     expect(bootstrapCalls).toBe(1);
   });
 
+  it('a REJECTED env/injected refresh token is not re-selected, so the next call re-bootstraps', async () => {
+    // fleet-audit#42: a revoked-but-unexpired ALPHAPORTAL_REFRESH_TOKEN (or
+    // injected token) used to be picked again on every call — clearing the
+    // store only removed the persisted copy — so the bootstrap never ran.
+    const dead = jwt(FUTURE + 100); // outranks anything the bridge returns
+    let stored: string | null = null;
+    const io = {
+      load: () => stored,
+      save: (_a: string, t: string) => { stored = t; },
+      clear: () => { stored = null; },
+    };
+    const refreshedWith: string[] = [];
+    const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.includes('/public/refresh-token')) {
+        const sent = JSON.stringify(init?.body ?? '') + url;
+        refreshedWith.push(sent);
+        if (sent.includes(dead)) return res(401, { success: false, message: 'Invalid user!' });
+        return res(200, { success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } });
+      }
+      return res(200, { success: true, data: { students: [] } });
+    }) as unknown as typeof fetch;
+    let bootstrapCalls = 0;
+    const bootstrapImpl = async () => {
+      bootstrapCalls += 1;
+      return { localStorage: { ALPHAPORTAL_REFRESH_TOKEN: jwt(FUTURE) }, missing: { localStorage: [] } };
+    };
+
+    for (const source of ['env', 'injected'] as const) {
+      stored = null;
+      bootstrapCalls = 0;
+      if (source === 'env') process.env.ALPHAPORTAL_REFRESH_TOKEN = dead;
+      try {
+        const client = new AlphaPortalClient({
+          ...(source === 'injected' ? { refreshToken: dead } : {}),
+          sessionIO: io,
+          fetchImpl,
+          bootstrapImpl,
+        });
+        await expect(client.read('AlphaPortal/v1/user-students/list')).rejects.toThrow();
+        expect(client.hasStaticToken(), `${source}: a rejected token is not usable`).toBe(false);
+
+        const data = await client.read<{ students: unknown[] }>('AlphaPortal/v1/user-students/list');
+        expect(data.students).toEqual([]);
+        expect(bootstrapCalls, `${source}: must fall through to the bridge`).toBe(1);
+        expect(client.currentAuthSource()).toBe('browser-bootstrap');
+      } finally {
+        delete process.env.ALPHAPORTAL_REFRESH_TOKEN;
+      }
+    }
+  });
+
   it('a TRANSIENT refresh failure keeps the stored token (does not force re-capture)', async () => {
     let stored: string | null = jwt(FUTURE);
     const io = {
