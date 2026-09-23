@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.1...v1.0.2) (2026-09-23)
+
+
+### Bug Fixes
+
+* recover from revoked refresh tokens, start plugin via npx, and gate set_notification as destructive ([#57](https://github.com/chrischall/alphaportal-mcp/issues/57)) ([36d28e2](https://github.com/chrischall/alphaportal-mcp/commit/36d28e2906bef5d3b5555c18ddfa81a0019b9035))
+
 ## [1.0.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.0...v1.0.1) (2026-09-23)
 
 
