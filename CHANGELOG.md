@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.0...v1.1.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv from 18.0.1 to 18.0.2 in the production-dependencies group ([#64](https://github.com/chrischall/alphaportal-mcp/issues/64)) ([97cb410](https://github.com/chrischall/alphaportal-mcp/commit/97cb41020b3342dd907cf3823a652c19333aedc1))
+
 ## [1.1.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.2...v1.1.0) (2026-09-24)
 
 
