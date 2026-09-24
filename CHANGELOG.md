@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.2...v1.1.0) (2026-09-24)
+
+
+### Features
+
+* confirm writes with a preview token instead of confirm: true ([4f55529](https://github.com/chrischall/alphaportal-mcp/commit/4f555295388efa34ef5f2842c8c472c73de10d90))
+
+
+### Documentation
+
+* **readme:** label the Confirmations table header like its neighbour ([#61](https://github.com/chrischall/alphaportal-mcp/issues/61)) ([1201e55](https://github.com/chrischall/alphaportal-mcp/commit/1201e55fddf9ee551ca43d694b3448b01cdd8b53))
+
 ## [1.0.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.0.1...v1.0.2) (2026-09-23)
 
 
