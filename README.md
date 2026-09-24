@@ -23,7 +23,10 @@ notification preferences and walk-zone radius.
 - `alphaportal_get_profile`, `alphaportal_get_account`, `alphaportal_get_settings`
 - `alphaportal_session_status` — is a working session configured (no secrets returned)
 
-**Writes** (confirm-gated — a dry-run of the exact payload unless `confirm: true`):
+**Writes** (each asks you to confirm first — a confirmation prompt where the
+client supports one; otherwise the first call returns a preview of the exact
+payload plus a `confirmToken`, and only a repeat call with that token proceeds;
+see [Confirmations](#confirmations)):
 
 - `alphaportal_edit_walk_radius` — set a student's walk-zone radius (meters)
 - `alphaportal_set_notification` — set per-student push/email notification preferences
@@ -74,6 +77,14 @@ block (`.mcp.json` / mcpb user config both reference it).
 | `ALPHAPORTAL_REFRESH_TOKEN` | The refresh token. Optional if the fetchproxy bridge can read it from a signed-in tab; required for a headless/hosted deployment. |
 | `ALPHAPORTAL_DISABLE_FETCHPROXY` | Set to `1` to disable the browser-bridge fallback and require the env var. |
 | `ALPHAPORTAL_SESSION_FILE` | Override the store path (default `~/.alphaportal-mcp/session.json`). |
+
+### Confirmations
+
+| variable | default | |
+|---|---|---|
+| `MCP_CONFIRM_MODE` | `ask-user` | What a write does on a client that cannot show a confirmation prompt (claude.ai, Claude Desktop). `ask-user`: two steps — the first call does nothing and returns a preview plus a token, and the model must get your approval in chat before calling again with it. `auto`: the same two steps, but the model may use the token after reviewing the preview itself. `refuse`: writes are refused on such clients. A client that can show prompts (Claude Code) always gets the real prompt. An unrecognised value is treated as `refuse`. |
+| `MCP_CONFIRM_TTL_SECONDS` | `600` | How long a token stays valid. |
+| `MCP_CONFIRM_SECRET` | random per process | Signing key; set it only if tokens must survive a server restart. |
 
 ### Hosting on mcp-host
 

@@ -97,11 +97,11 @@
     },
     {
       "name": "alphaportal_edit_walk_radius",
-      "description": "Set a student's walk-zone radius (confirm-gated)"
+      "description": "Set a student's walk-zone radius (asks you to confirm first; a preview + confirmToken where prompts are unsupported)"
     },
     {
       "name": "alphaportal_set_notification",
-      "description": "Set a student's notification preferences (confirm-gated)"
+      "description": "Set a student's notification preferences (asks you to confirm first; a preview + confirmToken where prompts are unsupported)"
     },
     {
       "name": "alphaportal_session_status",

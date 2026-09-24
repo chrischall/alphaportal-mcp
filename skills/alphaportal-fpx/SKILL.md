@@ -95,7 +95,8 @@ ready-to-run `jq` recipes.
 
 Write endpoints (`radius-edit`, `setnotification`) exist and change real
 transportation records; the `alphaportal-mcp` server gates them behind a
-`confirm` dry-run. This shell skill has **no dry-run** — curl just does it — so
+confirmation (a prompt, or a preview plus a one-time confirm token). This shell
+skill has **no preview or confirmation** — curl just does it — so
 treat every write as real and permanent. Request bodies are in
 `references/endpoints.md`. The transportation-request submission flow is
 deliberately undocumented here (its body was not fully verified).
