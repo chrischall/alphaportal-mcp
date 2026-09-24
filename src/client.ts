@@ -284,7 +284,7 @@ export class AlphaPortalClient {
 
   /**
    * A write: POST `body` to `path`. Same envelope handling as {@link read}; the
-   * caller (a confirm-gated tool) owns the dry-run gate. Kept separate so the
+   * caller (a confirm-gated tool) owns the confirmation gate. Kept separate so the
    * write path is a single auditable choke point.
    */
   async write<T>(

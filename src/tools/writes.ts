@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
-import { minifiedResult } from '@chrischall/mcp-utils';
+import { confirmTokenParam, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { WRITE } from '../endpoints.js';
-import { previewUnlessConfirmed, schemaConfirm } from './_confirm.js';
+import { confirmWrite } from './_confirm.js';
 
 /**
  * The five notification categories the portal exposes, each togglable per
@@ -58,7 +58,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
     'alphaportal_edit_walk_radius',
     {
       description:
-        "Set a student's walk-zone radius, in meters. This can affect transportation eligibility, so it is confirm-gated: without confirm:true it returns a dry-run of the exact payload. Verified required fields: studentId, radius.",
+        "Set a student's walk-zone radius, in meters. This can affect transportation eligibility, so it asks the user to confirm first: a confirmation prompt where the client supports one; otherwise the first call returns a preview of the exact payload and a confirmToken, and only a repeat call with that token proceeds (see MCP_CONFIRM_MODE). Verified required fields: studentId, radius.",
       annotations: { readOnlyHint: false, destructiveHint: true },
       inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
@@ -67,19 +67,22 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
           .int()
           .nonnegative()
           .describe('Walk-zone radius in meters (the API stores the base-unit distance).'),
-        confirm: schemaConfirm,
+        confirmToken: confirmTokenParam,
       }),
     },
-    async ({ studentId, radiusMeters, confirm }) => {
+    async ({ studentId, radiusMeters, confirmToken }, ctx) => {
       const body = { studentId, radius: radiusMeters };
-      const preview = previewUnlessConfirmed(
-        confirm,
-        'Edit walk-zone radius',
-        'POST',
-        WRITE.radiusEdit,
+      const gate = await confirmWrite(ctx, {
+        tool: 'alphaportal_edit_walk_radius',
+        actionId: 'alphaportal.edit_walk_radius',
+        label: 'Edit walk-zone radius',
+        message: 'Review and confirm this walk-zone radius change:',
+        path: WRITE.radiusEdit,
+        target: String(studentId),
         body,
-      );
-      if (preview) return preview;
+        confirmToken,
+      });
+      if (gate) return gate;
       return minifiedResult(await client.write(WRITE.radiusEdit, body));
     },
   );
@@ -88,7 +91,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
     'alphaportal_set_notification',
     {
       description:
-        "Set a student's transportation notification preferences (push/email, per AM/PM run) across the categories the district enables: stopRadiusEntry, studentScan, backupBus, schoolArrival, stopServiced. Confirm-gated: without confirm:true it returns a dry-run of the exact payload. NOTE: the portal sends the whole preference set at once; categories you omit may be left unchanged or reset by the server — review the dry-run first.",
+        "Set a student's transportation notification preferences (push/email, per AM/PM run) across the categories the district enables: stopRadiusEntry, studentScan, backupBus, schoolArrival, stopServiced. Asks the user to confirm first: a confirmation prompt where the client supports one; otherwise the first call returns a preview of the exact payload and a confirmToken, and only a repeat call with that token proceeds (see MCP_CONFIRM_MODE). NOTE: the portal sends the whole preference set at once; categories you omit may be left unchanged or reset by the server — review the preview first.",
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
       inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
@@ -105,19 +108,22 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
             stopServiced: channelSchema.optional(),
           })
           .describe('Per-category push/email toggles.'),
-        confirm: schemaConfirm,
+        confirmToken: confirmTokenParam,
       }),
     },
-    async ({ studentId, studentOriginalId, preferences, confirm }) => {
+    async ({ studentId, studentOriginalId, preferences, confirmToken }, ctx) => {
       const body = buildNotificationBody({ studentId, studentOriginalId, preferences });
-      const preview = previewUnlessConfirmed(
-        confirm,
-        'Set notification preferences',
-        'POST',
-        WRITE.setNotification,
+      const gate = await confirmWrite(ctx, {
+        tool: 'alphaportal_set_notification',
+        actionId: 'alphaportal.set_notification',
+        label: 'Set notification preferences',
+        message: 'Review and confirm these notification preference changes:',
+        path: WRITE.setNotification,
+        target: String(studentId),
         body,
-      );
-      if (preview) return preview;
+        confirmToken,
+      });
+      if (gate) return gate;
       return minifiedResult(await client.write(WRITE.setNotification, body));
     },
   );

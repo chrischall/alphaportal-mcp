@@ -66,8 +66,11 @@ Sample verified `vehicle-location` payload:
 
 ## Writes (confirm-gated; bodies transcribed from the web client)
 
-Both shipped writes route through the client's single `write()` and are gated by
-`confirm: true` (a dry-run of the exact payload is returned otherwise).
+Both shipped writes route through the client's single `write()` and ask the user
+to confirm first: a confirmation prompt where the client supports one; otherwise
+the first call returns a preview of the exact payload plus a `confirmToken`, and
+only a repeat call with that token (bound to that payload) performs the write
+(see `MCP_CONFIRM_MODE` in the README).
 
 ### `AlphaPortal/v1/user-students/radius-edit` — POST
 
@@ -84,7 +87,7 @@ the district's `applicationsetting` flags): `stopRadiusEntry`, `studentScan`,
 `backupBus`, `schoolArrival`, `stopServiced`. `setnotification-bulk` is the same
 body without `studentOriginalId`. The web client sends the whole preference set
 at once (read-modify-write of the form), so a partial body may leave omitted
-categories unchanged or reset them — the dry-run shows exactly what is sent.
+categories unchanged or reset them — the confirmation preview shows exactly what is sent.
 
 ## Not yet implemented (known gap)
 
