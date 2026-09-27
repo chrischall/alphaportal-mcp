@@ -77,6 +77,7 @@ describe('AlphaPortalClient auth + envelope', () => {
       // The hint (rendered into the tool text by createMcpServer) names the
       // console one-liner capture path.
       expect(err.hint).toMatch(/localStorage\.user/);
+      expect(err.hint).toMatch(/ContextMint Bridge/);
     } finally {
       delete process.env.ALPHAPORTAL_DISABLE_FETCHPROXY;
     }

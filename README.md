@@ -41,10 +41,14 @@ the request hot path**. There are two ways it gets that token, tried in order:
 
 1. **Automatic (fetchproxy bootstrap).** If `ALPHAPORTAL_REFRESH_TOKEN` is not
    set, the server reads it once from your signed-in AlphaPortal tab via the
-   **Transporter** browser extension (the fetchproxy bridge) — a one-shot read
-   that snapshots only the token (a JSON-pointer extraction, so your name/email/
-   phone never leave the browser), then closes. Requires the extension installed
-   and a signed-in `*.alphaportal.app` tab. Set `ALPHAPORTAL_DISABLE_FETCHPROXY=1`
+   **ContextMint Bridge** browser extension (the fetchproxy bridge) — a one-shot
+   read that snapshots only the token (a JSON-pointer extraction, so your name/
+   email/phone never leave the browser), then closes. Requires the extension
+   installed and a signed-in `*.alphaportal.app` tab. Get ContextMint Bridge from
+   its [releases page](https://github.com/nullnet-app/contextmint-bridge/releases):
+   in Chrome, unzip the chrome build and load it unpacked
+   (`chrome://extensions` → Developer mode → Load unpacked); in Safari it ships
+   inside the ContextMint app. Set `ALPHAPORTAL_DISABLE_FETCHPROXY=1`
    to turn this off.
 2. **Manual (env var).** Set `ALPHAPORTAL_REFRESH_TOKEN` yourself. Capture it in a
    signed-in tab's DevTools console:

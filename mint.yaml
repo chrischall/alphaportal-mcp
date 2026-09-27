@@ -10,7 +10,7 @@ env:
       DevTools console run: JSON.parse(localStorage.user).User.RefreshToken —
       it is an 8-day, reusable JWT, so re-capture and update this secret if it
       expires. (Locally, if unset, the server can also read it from a signed-in
-      tab via the fetchproxy/Transporter bridge; a plain hosted registration has
+      tab via the ContextMint Bridge (fetchproxy) extension; a plain hosted registration has
       no bridge, so set this secret.)
   - name: ALPHAPORTAL_DISABLE_FETCHPROXY
     required: false

@@ -37,14 +37,16 @@ Copy the value into your shell:
 export ALPHAPORTAL_RT='<paste the refresh token>'
 ```
 
-**Option B — fpx browser bridge** (needs the Transporter extension + a signed-in
+**Option B — fpx browser bridge** (needs the ContextMint Bridge extension — from
+https://github.com/nullnet-app/contextmint-bridge/releases; Chrome: load the chrome
+zip unpacked, Safari: ships inside the ContextMint app — plus a signed-in
 `*.alphaportal.app` tab):
 
 ```sh
 npm install -g @fetchproxy/cli                              # provides `fpx`
 fpx profile add alphaportal --domain alphaportal.app
 fpx profile declare alphaportal --local-storage user       # declare scope BEFORE first pairing
-fpx local-storage user -p alphaportal                      # first call prints a pair code → approve in Transporter
+fpx local-storage user -p alphaportal                      # first call prints a pair code → approve in ContextMint Bridge
 export ALPHAPORTAL_RT=$(fpx local-storage user -p alphaportal | jq -r '.user | fromjson | .User.RefreshToken')
 ```
 
