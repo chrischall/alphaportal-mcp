@@ -208,7 +208,7 @@ export class AlphaPortalClient {
       `ALPHAPORTAL_REFRESH_TOKEN is not set. ${bridgeLine}`,
       {
         hint:
-          'Either sign into https://cmsnc.alphaportal.app/ in a browser with the Transporter extension so it can be read automatically, ' +
+          'Either sign into https://cmsnc.alphaportal.app/ in a browser with the ContextMint Bridge extension so it can be read automatically, ' +
           'or set ALPHAPORTAL_REFRESH_TOKEN — capture it once by running in that tab\'s DevTools console: ' +
           'JSON.parse(localStorage.user).User.RefreshToken',
       },

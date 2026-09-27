@@ -35,6 +35,7 @@ describe('bootstrapRefreshToken', () => {
     expect(notSignedIn).toBeInstanceOf(BootstrapError);
     expect(notSignedIn.message).toMatch(/does not look signed in/);
     expect(notSignedIn.hint).toMatch(/sign into/i);
+    expect(notSignedIn.hint).toMatch(/ContextMint Bridge/);
 
     // Key WAS returned, but the pointer did not resolve → storage shape moved.
     const badPointer = await bootstrapRefreshToken(async () => ({

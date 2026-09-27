@@ -3,7 +3,7 @@
  *
  * When no `ALPHAPORTAL_REFRESH_TOKEN` is configured, rather than failing, the
  * server reads it once from the user's signed-in AlphaPortal tab via the
- * fetchproxy browser bridge (the Transporter extension). This is a ONE-SHOT
+ * fetchproxy browser bridge (the ContextMint Bridge extension). This is a ONE-SHOT
  * read: the bridge snapshots the token and closes; every actual API call still
  * goes out via plain Node `fetch` (see `client.ts`). fetchproxy is never in the
  * request hot path.
@@ -103,7 +103,7 @@ export async function bootstrapRefreshToken(bootstrapImpl?: BootstrapFn): Promis
         ? `The AlphaPortal tab has no "${STORAGE_KEY}" in localStorage — it does not look signed in.`
         : `The AlphaPortal tab returned "${STORAGE_KEY}" but ${REFRESH_POINTER} did not resolve — the app's stored session shape may have changed.`,
       keyMissing
-        ? 'Open and sign into your AlphaPortal host (e.g. https://cmsnc.alphaportal.app/) in the browser with the Transporter extension, then retry.'
+        ? 'Open and sign into your AlphaPortal host (e.g. https://cmsnc.alphaportal.app/) in the browser with the ContextMint Bridge extension, then retry.'
         : `Check the value in that tab's console: JSON.parse(localStorage.user).User.RefreshToken — and set ALPHAPORTAL_REFRESH_TOKEN manually if the shape has moved.`,
     );
   }
