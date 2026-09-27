@@ -18,7 +18,7 @@
       "environmentVariables": [
         {
           "name": "ALPHAPORTAL_REFRESH_TOKEN",
-          "description": "Optional refresh token; if unset, read from a signed-in tab via the fetchproxy bridge",
+          "description": "Optional refresh token; if unset, read from a signed-in tab via the ContextMint Bridge extension",
           "isRequired": false,
           "format": "string",
           "isSecret": true
