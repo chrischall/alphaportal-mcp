@@ -41,15 +41,22 @@ the request hot path**. There are two ways it gets that token, tried in order:
 
 1. **Automatic (fetchproxy bootstrap).** If `ALPHAPORTAL_REFRESH_TOKEN` is not
    set, the server reads it once from your signed-in AlphaPortal tab via the
-   **ContextMint Bridge** browser extension (the fetchproxy bridge) — a one-shot
+   **ContextMint Bridge** browser extension (formerly the fetchproxy extension) — a one-shot
    read that snapshots only the token (a JSON-pointer extraction, so your name/
    email/phone never leave the browser), then closes. Requires the extension
    installed and a signed-in `*.alphaportal.app` tab. Get ContextMint Bridge from
    its [releases page](https://github.com/nullnet-app/contextmint-bridge/releases):
    in Chrome, unzip the chrome build and load it unpacked
-   (`chrome://extensions` → Developer mode → Load unpacked); in Safari it ships
-   inside the ContextMint app. Set `ALPHAPORTAL_DISABLE_FETCHPROXY=1`
-   to turn this off.
+   (`chrome://extensions` → Developer mode → Load unpacked). Safari isn't
+   available yet (it will ship inside the ContextMint app, which has no public
+   download), so use Chrome for now. ContextMint Bridge is the fetchproxy
+   browser extension under its new name, from the same maintainer —
+   fetchproxy's own [README](https://github.com/chrischall/fetchproxy#extension)
+   points to it. Its source is public at
+   https://github.com/nullnet-app/contextmint-bridge: build it yourself, or check
+   a release zip against the `.sha256` file published beside it
+   (`shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`).
+   Set `ALPHAPORTAL_DISABLE_FETCHPROXY=1` to turn this off.
 2. **Manual (env var).** Set `ALPHAPORTAL_REFRESH_TOKEN` yourself. Capture it in a
    signed-in tab's DevTools console:
    ```js
@@ -78,7 +85,7 @@ block (`.mcp.json` / mcpb user config both reference it).
 
 | Variable | Purpose |
 | --- | --- |
-| `ALPHAPORTAL_REFRESH_TOKEN` | The refresh token. Optional if the fetchproxy bridge can read it from a signed-in tab; required for a headless/hosted deployment. |
+| `ALPHAPORTAL_REFRESH_TOKEN` | The refresh token. Optional if ContextMint Bridge can read it from a signed-in tab; required for a headless/hosted deployment. |
 | `ALPHAPORTAL_DISABLE_FETCHPROXY` | Set to `1` to disable the browser-bridge fallback and require the env var. |
 | `ALPHAPORTAL_SESSION_FILE` | Override the store path (default `~/.alphaportal-mcp/session.json`). |
 

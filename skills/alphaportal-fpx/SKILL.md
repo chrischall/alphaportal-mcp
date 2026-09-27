@@ -39,8 +39,10 @@ export ALPHAPORTAL_RT='<paste the refresh token>'
 
 **Option B — fpx browser bridge** (needs the ContextMint Bridge extension — from
 https://github.com/nullnet-app/contextmint-bridge/releases; Chrome: load the chrome
-zip unpacked, Safari: ships inside the ContextMint app — plus a signed-in
-`*.alphaportal.app` tab):
+zip unpacked; Safari isn't available yet, so use Chrome for now — plus a signed-in
+`*.alphaportal.app` tab). ContextMint Bridge is the fetchproxy extension renamed, same
+maintainer; source is public at https://github.com/nullnet-app/contextmint-bridge — build
+it yourself or verify a release zip with `shasum -a 256 -c contextmint-bridge-chrome-<version>.zip.sha256`:
 
 ```sh
 npm install -g @fetchproxy/cli                              # provides `fpx`
