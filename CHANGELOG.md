@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.1...v1.1.2) (2026-09-27)
+
+
+### Bug Fixes
+
+* **deps:** move to [@fetchproxy](https://github.com/fetchproxy) 3.4 for ContextMint Bridge errors, capability subsets and managed pins ([#66](https://github.com/chrischall/alphaportal-mcp/issues/66)) ([9c2333d](https://github.com/chrischall/alphaportal-mcp/commit/9c2333d14c72a3e9df8a89212764f7858c49b43e))
+* **deps:** move to @chrischall/mcp-utils 2.8 and [@fetchproxy](https://github.com/fetchproxy) 3.4.1 for clearer browser-bridge errors ([#68](https://github.com/chrischall/alphaportal-mcp/issues/68)) ([3092883](https://github.com/chrischall/alphaportal-mcp/commit/3092883fe342768620435c37a85573a309b207b3))
+
 ## [1.1.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.0...v1.1.1) (2026-09-24)
 
 
