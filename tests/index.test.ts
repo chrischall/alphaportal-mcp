@@ -8,6 +8,7 @@ import { registerNotificationTools } from '../src/tools/notifications.js';
 import { registerReferenceTools } from '../src/tools/reference.js';
 import { registerWriteTools } from '../src/tools/writes.js';
 import { registerSessionTools } from '../src/tools/session.js';
+import { registerHealthcheckTools } from '../src/tools/healthcheck.js';
 import { createTestHarness } from './helpers.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -28,6 +29,7 @@ const EXPECTED = [
   'alphaportal_edit_walk_radius',
   'alphaportal_set_notification',
   'alphaportal_session_status',
+  'alphaportal_healthcheck',
 ];
 
 describe('tool registry', () => {
@@ -41,6 +43,7 @@ describe('tool registry', () => {
       registerReferenceTools(server, client);
       registerWriteTools(server, client);
       registerSessionTools(server, client);
+      registerHealthcheckTools(server, client);
     });
     names = (await harness.listTools()).map((t) => t.name);
   });

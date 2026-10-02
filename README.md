@@ -22,6 +22,7 @@ notification preferences and walk-zone radius.
 - `alphaportal_list_schools`, `alphaportal_list_grades` — district reference data
 - `alphaportal_get_profile`, `alphaportal_get_account`, `alphaportal_get_settings`
 - `alphaportal_session_status` — is a working session configured (no secrets returned)
+- `alphaportal_healthcheck` — which hop is broken: no refresh token resolved, AlphaPortal rejected it, a CDN/WAF blocked the request, or the API is down (no secrets returned)
 
 **Writes** (each asks you to confirm first — a confirmation prompt where the
 client supports one; otherwise the first call returns a preview of the exact

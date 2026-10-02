@@ -123,6 +123,27 @@ export class AlphaPortalClient {
   }
 
   /**
+   * Resolve the refresh token exactly as a real tool call does (same cache,
+   * same env → store → browser-bootstrap order) and report WHERE it came from —
+   * never the token. For `alphaportal_healthcheck`'s resolver.
+   *
+   * The "no credentials" error carries its capture guidance on `hint`, which
+   * the healthcheck would drop; it is folded into the message here so the one
+   * actionable part survives.
+   */
+  async describeCredential(): Promise<{ source: AuthSource }> {
+    try {
+      await this.ensureApi();
+    } catch (err) {
+      if (err instanceof McpToolError && err.hint) {
+        throw new Error(`${err.message} ${err.hint}`, { cause: err });
+      }
+      throw err;
+    }
+    return { source: this.authSource ?? 'env-or-store' };
+  }
+
+  /**
    * Pick the best usable refresh token among injected / env / persisted store
    * (no bridge). Returns `null` when none is usable, so the caller can fall
    * through to the browser bootstrap.
