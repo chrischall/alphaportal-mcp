@@ -1,9 +1,8 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
-import { confirmTokenParam, minifiedResult } from '@chrischall/mcp-utils';
+import { confirmTokenParam, confirmWrite, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { WRITE } from '../endpoints.js';
-import { confirmWrite } from './_confirm.js';
 
 /**
  * The five notification categories the portal exposes, each togglable per
@@ -74,12 +73,12 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       const body = { studentId, radius: radiusMeters };
       const gate = await confirmWrite(ctx, {
         tool: 'alphaportal_edit_walk_radius',
-        actionId: 'alphaportal.edit_walk_radius',
-        label: 'Edit walk-zone radius',
+        action: 'alphaportal.edit_walk_radius',
+        summary: 'Edit walk-zone radius',
         message: 'Review and confirm this walk-zone radius change:',
-        path: WRITE.radiusEdit,
+        account: undefined,
         target: String(studentId),
-        body,
+        request: { method: 'POST', path: WRITE.radiusEdit, body },
         confirmToken,
       });
       if (gate) return gate;
@@ -115,12 +114,12 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       const body = buildNotificationBody({ studentId, studentOriginalId, preferences });
       const gate = await confirmWrite(ctx, {
         tool: 'alphaportal_set_notification',
-        actionId: 'alphaportal.set_notification',
-        label: 'Set notification preferences',
+        action: 'alphaportal.set_notification',
+        summary: 'Set notification preferences',
         message: 'Review and confirm these notification preference changes:',
-        path: WRITE.setNotification,
+        account: undefined,
         target: String(studentId),
-        body,
+        request: { method: 'POST', path: WRITE.setNotification, body },
         confirmToken,
       });
       if (gate) return gate;

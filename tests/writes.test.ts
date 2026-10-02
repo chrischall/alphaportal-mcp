@@ -144,6 +144,21 @@ describe('write tools confirm gate', () => {
     await harness.close();
   });
 
+  it('a token minted for one student is refused for another (target bound) with no write', async () => {
+    const { harness, calls } = await harnessWithMock();
+    const { confirmToken } = parseToolResult<PhaseOne>(
+      await harness.callTool('alphaportal_edit_walk_radius', { studentId: 42, radiusMeters: 800 }),
+    );
+    const other = await harness.callTool('alphaportal_edit_walk_radius', {
+      studentId: 43,
+      radiusMeters: 800,
+      confirmToken,
+    });
+    expect(text(other)).toContain('TOKEN_INVALID');
+    expect(calls('radius-edit')).toBe(0);
+    await harness.close();
+  });
+
   it('a client that accepts the elicitation prompt gets the write', async () => {
     const { harness, calls } = await harnessWithMock({
       elicitation: async () => ({ action: 'accept', content: { confirmed: true } }),
