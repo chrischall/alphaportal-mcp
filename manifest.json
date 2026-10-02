@@ -106,6 +106,10 @@
     {
       "name": "alphaportal_session_status",
       "description": "Check whether a working AlphaPortal session is configured"
+    },
+    {
+      "name": "alphaportal_healthcheck",
+      "description": "Diagnose which hop is broken: no refresh token resolved, AlphaPortal rejected it, a CDN/WAF blocked the request, or the API is down"
     }
   ],
   "compatibility": {

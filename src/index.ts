@@ -7,6 +7,7 @@ import { registerNotificationTools } from './tools/notifications.js';
 import { registerReferenceTools } from './tools/reference.js';
 import { registerWriteTools } from './tools/writes.js';
 import { registerSessionTools } from './tools/session.js';
+import { registerHealthcheckTools } from './tools/healthcheck.js';
 
 // runMcp builds the McpServer, applies the registrars (threading `client`
 // through as deps), prints the banner to stderr, wires graceful shutdown, and
@@ -28,5 +29,6 @@ await runMcp({
     registerReferenceTools,
     registerWriteTools,
     registerSessionTools,
+    registerHealthcheckTools,
   ],
 });

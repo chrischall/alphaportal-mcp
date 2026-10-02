@@ -39,9 +39,28 @@ export type FetchLike = typeof fetch;
  * error the same way would throw away a perfectly good credential.
  */
 export class RefreshTokenRejectedError extends Error {
+  /** Always 401 — carried so a status-ladder classifier reads it as a rejection. */
+  readonly status = 401;
   constructor(message: string) {
     super(message);
     this.name = 'RefreshTokenRejectedError';
+  }
+}
+
+/**
+ * A non-401 failure of the token exchange. Carries the status and the head of
+ * the response body so `alphaportal_healthcheck` can tell an AlphaPortal-side
+ * outage (`http`) and a CDN/WAF refusal page (`edge_blocked`) apart from a
+ * rejected credential. The body is never put in the message.
+ */
+export class RefreshHttpError extends Error {
+  readonly status: number;
+  readonly bodyPreview: string;
+  constructor(status: number, bodyPreview: string) {
+    super(`AlphaPortal token refresh failed (HTTP ${status}).`);
+    this.name = 'RefreshHttpError';
+    this.status = status;
+    this.bodyPreview = bodyPreview;
   }
 }
 
@@ -84,7 +103,7 @@ export async function refreshAccessToken(
           'host so it can be re-read, or re-capture it and update ALPHAPORTAL_REFRESH_TOKEN.',
       );
     }
-    throw new Error(`AlphaPortal token refresh failed (HTTP ${res.status}).`);
+    throw new RefreshHttpError(res.status, text.slice(0, 2048));
   }
 
   let parsed: { success?: boolean; data?: Partial<RefreshResult>; message?: string };
