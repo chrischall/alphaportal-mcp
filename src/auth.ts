@@ -16,7 +16,7 @@
  * persists to roll the window forward (see `session.ts`).
  */
 
-import { decodeJwtExp } from '@chrischall/mcp-utils';
+import { decodeJwtExp, detectEdgeBlock, EdgeBlockedError } from '@chrischall/mcp-utils';
 import { BASE_URL, REFRESH_PATH } from './endpoints.js';
 
 /** The subset of the refresh response this server relies on. */
@@ -48,10 +48,10 @@ export class RefreshTokenRejectedError extends Error {
 }
 
 /**
- * A non-401 failure of the token exchange. Carries the status and the head of
- * the response body so `alphaportal_healthcheck` can tell an AlphaPortal-side
- * outage (`http`) and a CDN/WAF refusal page (`edge_blocked`) apart from a
- * rejected credential. The body is never put in the message.
+ * A non-401 failure of the token exchange that is not a CDN/WAF refusal (those
+ * throw `EdgeBlockedError`). Carries the status and the head of the response
+ * body so `alphaportal_healthcheck` can tell an AlphaPortal-side outage (`http`)
+ * apart from a rejected credential. The body is never put in the message.
  */
 export class RefreshHttpError extends Error {
   readonly status: number;
@@ -67,7 +67,10 @@ export class RefreshHttpError extends Error {
 /**
  * Exchange a refresh token for a fresh token pair.
  *
- * Throws a plain `Error` on a non-2xx or malformed response; the caller
+ * Throws `EdgeBlockedError` when a CDN/WAF refused the exchange (the token was
+ * never judged — keep it), `RefreshTokenRejectedError` on AlphaPortal's own
+ * 401, `RefreshHttpError` on any other non-2xx, and a plain `Error` on a
+ * malformed response; the caller
  * (`TokenManager.refresh`) surfaces it, and the tool boundary redacts it. The
  * error message never echoes the token — only its shape-less failure reason.
  */
@@ -94,6 +97,20 @@ export async function refreshAccessToken(
 
   const text = await res.text();
   if (!res.ok) {
+    // A CDN/WAF refusal page (CloudFront, Cloudflare, ...) never reached the
+    // token endpoint, so nothing judged the token — even when the edge answers
+    // with a 401. Checked FIRST so a block can never be read as a rejection and
+    // cost the user their stored 8-day credential (chrischall/mcp-host#1015).
+    // AlphaPortal's own JSON 401 carries no refusal-page markers and falls
+    // through to the rejection below.
+    const block = detectEdgeBlock({ body: text, headers: res.headers, status: res.status });
+    if (block) {
+      throw new EdgeBlockedError(res.status, block.vendor, {
+        service: 'AlphaPortal',
+        method: 'POST',
+        path: `/${REFRESH_PATH}`,
+      });
+    }
     // 401 means the refresh token itself is dead. Typed so the caller can
     // discard the persisted copy and re-bootstrap; any other status is a
     // transient failure and must NOT cost the user their stored credential.
