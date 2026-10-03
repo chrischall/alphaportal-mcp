@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.2.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.2...v1.2.0) (2026-10-03)
+
+
+### Features
+
+* add alphaportal_healthcheck ([#73](https://github.com/chrischall/alphaportal-mcp/issues/73)) ([f3019f7](https://github.com/chrischall/alphaportal-mcp/commit/f3019f74e0a81cf6d4c6c32695e50420d5e1e7f0))
+
+
+### Bug Fixes
+
+* **deps:** adopt @chrischall/mcp-utils 2.12.0 confirmWrite kit ([#77](https://github.com/chrischall/alphaportal-mcp/issues/77)) ([abd46d1](https://github.com/chrischall/alphaportal-mcp/commit/abd46d10606ccc64ee3c4efe2693e19de6fcc6de))
+* **deps:** bump @chrischall/mcp-utils to 2.13.0 ([#78](https://github.com/chrischall/alphaportal-mcp/issues/78)) ([f7246f8](https://github.com/chrischall/alphaportal-mcp/commit/f7246f8c12e4235c973d0d6dfdc2359cb88751bc))
+* **deps:** bump dotenv from 18.0.2 to 18.0.4 in the production-dependencies group ([#71](https://github.com/chrischall/alphaportal-mcp/issues/71)) ([dd567fa](https://github.com/chrischall/alphaportal-mcp/commit/dd567fa3082120c2df2163a952453dc81e3201e7))
+* keep credentials and report edge_blocked on CDN/WAF blocks (mcp-utils 2.10.0) ([#74](https://github.com/chrischall/alphaportal-mcp/issues/74)) ([ac1a70a](https://github.com/chrischall/alphaportal-mcp/commit/ac1a70a7ff12dbe9b2bbdd0d655000f4598452fd))
+* keep the stored refresh token when a CDN/WAF blocks the token refresh ([#75](https://github.com/chrischall/alphaportal-mcp/issues/75)) ([67e924f](https://github.com/chrischall/alphaportal-mcp/commit/67e924fa314794b8dc16c1e54cd2794ebd7eade8))
+* keep write approvals valid across a hosted restart (mcp-utils 2.11.0) ([#76](https://github.com/chrischall/alphaportal-mcp/issues/76)) ([43381fa](https://github.com/chrischall/alphaportal-mcp/commit/43381fa02c8a40d688205e5b6252bf2c6190c2a6))
+
 ## [1.1.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.1...v1.1.2) (2026-09-27)
 
 
