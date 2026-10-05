@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.0...v1.2.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* **deps:** require @chrischall/mcp-utils 2.14.0 and MCP SDK 2.3.0 ([#79](https://github.com/chrischall/alphaportal-mcp/issues/79)) ([2dcf852](https://github.com/chrischall/alphaportal-mcp/commit/2dcf852cc6b88d681820c5cf742b5cd30818428c))
+
 ## [1.2.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.1.2...v1.2.0) (2026-10-03)
 
 
