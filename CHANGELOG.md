@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.1...v1.2.2) (2026-10-07)
+
+
+### Bug Fixes
+
+* **deps:** bump the production-dependencies group with 2 updates ([#83](https://github.com/chrischall/alphaportal-mcp/issues/83)) ([e6d1ba2](https://github.com/chrischall/alphaportal-mcp/commit/e6d1ba2939bf6700313a99deff71ccaa49d412fc))
+* **deps:** retry browser-bridge connections awaiting approval and allow disabling confirm prompts ([#86](https://github.com/chrischall/alphaportal-mcp/issues/86)) ([b088950](https://github.com/chrischall/alphaportal-mcp/commit/b088950c0cb9e330d08d098603c775c32b1ef72e))
+
+
+### Documentation
+
+* document MCP_CONFIRM_ELICITATION ([#87](https://github.com/chrischall/alphaportal-mcp/issues/87)) ([5600d45](https://github.com/chrischall/alphaportal-mcp/commit/5600d4502aa0682064b085ea99af6094a3768484))
+
 ## [1.2.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.0...v1.2.1) (2026-10-05)
 
 
