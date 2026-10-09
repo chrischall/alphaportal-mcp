@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BASE_URL } from '../src/endpoints.js';
@@ -52,6 +52,16 @@ describe('packaging', () => {
     expect(JSON.stringify(server)).not.toMatch(/dist\//);
     // The env passthrough must survive the switch.
     expect(server.env.ALPHAPORTAL_REFRESH_TOKEN).toBe('${ALPHAPORTAL_REFRESH_TOKEN}');
+  });
+
+  it('plugin.json declares its MCP config under mcpServers, the key Claude Code reads', () => {
+    // Claude Code ignores an `mcp` key ("Unknown field 'mcp'"); it only
+    // appeared to work because ./.mcp.json is the default. Copies of the
+    // pattern with a non-default path broke plugin installs elsewhere.
+    const plugin = read('.claude-plugin/plugin.json');
+    expect(plugin).not.toHaveProperty('mcp');
+    expect(plugin.mcpServers).toBe('./.mcp.json');
+    expect(existsSync(join(ROOT, plugin.mcpServers))).toBe(true);
   });
 
   it('server.json description is within the 100-char registry limit', () => {
