@@ -324,6 +324,10 @@ export class AlphaPortalClient {
     const url =
       '/' + path + (opts.pathSuffix ?? '') + (opts.query ? buildQueryString(opts.query) : '');
     const envelope = await api.fetchJson<Envelope<T>>(opts.method ?? 'GET', url, {
+      // A read is safe to repeat even when sent as POST (the profile
+      // endpoint): a timeout or dropped connection is a plain read failure,
+      // never mcp-utils' WriteOutcomeUnknownError.
+      idempotent: true,
       ...(opts.body !== undefined ? { body: opts.body } : {}),
     });
     return this.unwrap(envelope, path);
@@ -332,7 +336,9 @@ export class AlphaPortalClient {
   /**
    * A write: POST `body` to `path`. Same envelope handling as {@link read}; the
    * caller (a confirm-gated tool) owns the confirmation gate. Kept separate so the
-   * write path is a single auditable choke point.
+   * write path is a single auditable choke point. A write that times out or
+   * loses its connection after sending throws mcp-utils' WriteOutcomeUnknownError
+   * (`retrySafe: false`) — the change may have been applied.
    */
   async write<T>(
     path: string,
