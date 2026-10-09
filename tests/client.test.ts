@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { WriteOutcomeUnknownError } from '@chrischall/mcp-utils';
 import { AlphaPortalClient } from '../src/client.js';
 import { nullSessionIO, type SessionIO } from '../src/session.js';
 
@@ -340,5 +341,43 @@ describe('AlphaPortalClient.principal', () => {
     reject = false;
     user = 'b@example.com';
     await expect(client.principal()).resolves.toBe('b@example.com');
+  });
+});
+
+describe('AlphaPortalClient outcome-unknown writes (mcp-utils 3)', () => {
+  /** Mints a token, then drops the connection on every API request. */
+  function droppingFetch() {
+    return vi.fn(async (url: string) => {
+      if (url.includes('/public/refresh-token')) {
+        return res(200, { success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } });
+      }
+      throw new TypeError('fetch failed');
+    }) as unknown as typeof fetch;
+  }
+
+  it('a dropped POST read (the profile) is a plain read failure, not an outcome-unknown write', async () => {
+    const client = new AlphaPortalClient({
+      refreshToken: jwt(FUTURE),
+      sessionIO: nullSessionIO,
+      fetchImpl: droppingFetch(),
+    });
+    const err = await client
+      .read('AlphaCore/v1/user/profile', { method: 'POST', body: {} })
+      .catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(Error);
+    expect(err).not.toBeInstanceOf(WriteOutcomeUnknownError);
+  });
+
+  it('a dropped write throws WriteOutcomeUnknownError (do not resend blindly)', async () => {
+    const client = new AlphaPortalClient({
+      refreshToken: jwt(FUTURE),
+      sessionIO: nullSessionIO,
+      fetchImpl: droppingFetch(),
+    });
+    const err = await client
+      .write('AlphaPortal/v1/notification/set', { enabled: true })
+      .catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(WriteOutcomeUnknownError);
+    expect((err as WriteOutcomeUnknownError).retrySafe).toBe(false);
   });
 });
