@@ -17,7 +17,7 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
     {
       description:
         'Check whether the server can authenticate to AlphaPortal: it resolves the refresh token (from ALPHAPORTAL_REFRESH_TOKEN, the saved session, or a signed-in browser tab via the bridge) and tries to mint an access token. Returns no credentials.',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => {

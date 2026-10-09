@@ -14,7 +14,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     'alphaportal_get_profile',
     {
       description: 'Get the signed-in user profile (name, email, role, account).',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.profile, { method: 'POST', body: {} })),
@@ -25,7 +25,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     {
       description:
         'Get the account (school district) info — name, timezone, date/phone formats — and the current server date.',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => {
@@ -42,7 +42,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     {
       description:
         'Get the portal feature/visibility settings (which notification types and features are enabled for this district).',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.applicationSetting)),
@@ -53,7 +53,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     {
       description:
         'List all schools in the district with names and coordinates (lat/lng). Useful for resolving a school by name.',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.schoolLightList)),
@@ -63,7 +63,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     'alphaportal_list_grades',
     {
       description: 'List the district grade levels (id + name).',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.gradeList)),
@@ -74,7 +74,7 @@ export function registerReferenceTools(server: McpServer, client: AlphaPortalCli
     {
       description:
         'List the transportation requests submitted on this account, with tracking numbers and status.',
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () => minifiedResult(await client.read(READ.requestList)),

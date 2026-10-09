@@ -19,7 +19,7 @@ export function registerNotificationTools(server: McpServer, client: AlphaPortal
     'alphaportal_list_notifications',
     {
       description: `List the account's transportation notifications — arrival/departure alerts (e.g. "arrived at school") with title, body, the student, and timestamp. ${UNTRUSTED_DESCRIPTION_SUFFIX}`,
-      annotations: { readOnlyHint: true },
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: z.object({}),
     },
     async () =>
