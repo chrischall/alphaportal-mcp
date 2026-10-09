@@ -55,8 +55,13 @@ describe('write tools confirm gate', () => {
     }
   });
 
-  async function harnessWithMock(options?: TestHarnessOptions) {
+  async function harnessWithMock(options?: TestHarnessOptions, userName = 'parent-a@example.com') {
     const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/user/profile'))
+        return new Response(JSON.stringify({ success: true, data: { Profile: { UserName: userName } } }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
       if (url.includes('/public/refresh-token'))
         return new Response(
           JSON.stringify({ success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } }),
@@ -199,6 +204,32 @@ describe('write tools confirm gate', () => {
     });
     expect(text(other)).toContain('TOKEN_INVALID');
     expect(calls('radius-edit')).toBe(0);
+    await harness.close();
+  });
+
+  it('under a shared MCP_CONFIRM_SECRET a token minted for one account is refused for another', async () => {
+    process.env.MCP_CONFIRM_SECRET = 'shared-across-tenants-secret-0123456789';
+    const a = await harnessWithMock(undefined, 'parent-a@example.com');
+    const b = await harnessWithMock(undefined, 'parent-b@example.com');
+    const args = { studentId: 42, radiusMeters: 800 };
+    const { confirmToken } = parseToolResult<PhaseOne>(await a.harness.callTool('alphaportal_edit_walk_radius', args));
+    const cross = await b.harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(text(cross)).toContain('TOKEN_INVALID');
+    expect(b.calls('radius-edit')).toBe(0);
+    // The same account still redeems it.
+    const same = await a.harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(same.isError).toBeFalsy();
+    expect(a.calls('radius-edit')).toBe(1);
+    await a.harness.close();
+    await b.harness.close();
+  });
+
+  it('resolves the signed-in account once per client, not on every write', async () => {
+    const { harness, calls } = await harnessWithMock();
+    const args = { studentId: 42, radiusMeters: 800 };
+    const { confirmToken } = parseToolResult<PhaseOne>(await harness.callTool('alphaportal_edit_walk_radius', args));
+    await harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(calls('/user/profile')).toBe(1);
     await harness.close();
   });
 
