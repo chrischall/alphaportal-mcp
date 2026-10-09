@@ -70,6 +70,27 @@ rolls forward as long as you use it at least once every 8 days. If it expires,
 sign back in (path 1) or re-capture (path 2). The `alphaportal-fpx` skill under
 `skills/` documents the same capture from a shell via the `fpx` CLI.
 
+### Keeping the stored token safe
+
+The saved session (`~/.alphaportal-mcp/session.json`, or
+`ALPHAPORTAL_SESSION_FILE`) holds the refresh token in **plaintext** JSON — the
+file is `0600` in a `0700` directory, but it is not in an OS keychain. Treat it
+like a password:
+
+- **Anyone who copies it once can keep refreshing indefinitely.** AlphaPortal
+  validates the token statelessly (signature + expiry), so a used token keeps
+  working until it expires, and every refresh mints a new 8-day one. A copy —
+  from a backup, a synced home directory, or another process running as you —
+  gives ongoing access to your children's names, schools, home stop locations
+  and live bus GPS.
+- **You cannot revoke it from here.** Deleting the file stops *this* server
+  using it, not a copy, which stays valid until it expires. Whether an
+  AlphaPortal password change invalidates outstanding tokens is unverified;
+  if you suspect a copy leaked, change your password and ask the district to
+  reset your portal account.
+- Keep `~/.alphaportal-mcp/` out of cloud-synced folders and unencrypted
+  backups, and delete it when you stop using the server.
+
 ## Setup
 
 ```sh
