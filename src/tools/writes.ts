@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/server';
 import { confirmTokenParam, confirmWrite, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
-import { WRITE } from '../endpoints.js';
+import { READ, WRITE } from '../endpoints.js';
 
 /**
  * The five notification categories the portal exposes, each togglable per
@@ -52,6 +52,23 @@ export function buildNotificationBody(args: {
   return body;
 }
 
+/**
+ * Name the student a write targets, for the confirmation preview. A parent
+ * with several children cannot tell from a bare numeric studentId whose walk
+ * zone or alerts are about to change — which is the decision the gate exists
+ * to put in front of them. Read fresh on every call (both phases), so the
+ * label is bound into the token like the rest of the preview.
+ */
+export async function describeStudent(client: AlphaPortalClient, studentId: number): Promise<string> {
+  const data = await client.read<{ students?: Array<{ studentId?: number; studentName?: string }> }>(
+    READ.studentLightList,
+  );
+  const match = data?.students?.find((s) => s.studentId === studentId);
+  return match?.studentName
+    ? `${match.studentName} (${studentId})`
+    : `${studentId} (not a student on this account)`;
+}
+
 export function registerWriteTools(server: McpServer, client: AlphaPortalClient): void {
   server.registerTool(
     'alphaportal_edit_walk_radius',
@@ -79,6 +96,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
         account: undefined,
         target: String(studentId),
         request: { method: 'POST', path: WRITE.radiusEdit, body },
+        preview: { student: await describeStudent(client, studentId) },
         confirmToken,
       });
       if (gate) return gate;
@@ -120,6 +138,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
         account: undefined,
         target: String(studentId),
         request: { method: 'POST', path: WRITE.setNotification, body },
+        preview: { student: await describeStudent(client, studentId) },
         confirmToken,
       });
       if (gate) return gate;
