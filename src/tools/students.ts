@@ -70,7 +70,8 @@ export function registerStudentTools(server: McpServer, client: AlphaPortalClien
     'alphaportal_get_report_link',
     {
       description:
-        "Get a one-time PDF download link for a student's transportation report (stops, schedule). Returns a URL to open in a browser.",
+        "Get a one-time PDF download link for a student's transportation report (stops, schedule). Returns a URL to open in a browser. " +
+        'The URL is single-use and credential-like — anyone holding it can download the report (home stop and schedule) without signing in — so hand it only to the signed-in user and do not share, post, or store it.',
       annotations: { readOnlyHint: true },
       inputSchema: z.object({ studentId: studentIdSchema }),
     },

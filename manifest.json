@@ -65,7 +65,7 @@
     },
     {
       "name": "alphaportal_get_report_link",
-      "description": "Get a PDF download link for a student's transportation report"
+      "description": "Get a single-use PDF download link for a student's transportation report (credential-like; do not share)"
     },
     {
       "name": "alphaportal_list_notifications",
