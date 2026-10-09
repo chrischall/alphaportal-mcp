@@ -65,6 +65,14 @@ export class RefreshHttpError extends Error {
 }
 
 /**
+ * How long the token exchange may take before it is aborted — the same bound
+ * `createApiClient` puts on every API call (client.ts). Without it a stalled
+ * connection hangs the first tool call, and every concurrent call queued
+ * behind the single-flight auth setup, indefinitely.
+ */
+export const REFRESH_TIMEOUT_MS = 30_000;
+
+/**
  * Exchange a refresh token for a fresh token pair.
  *
  * Throws `EdgeBlockedError` when a CDN/WAF refused the exchange (the token was
@@ -77,6 +85,7 @@ export class RefreshHttpError extends Error {
 export async function refreshAccessToken(
   refreshToken: string,
   fetchImpl: FetchLike = fetch,
+  timeoutMs: number = REFRESH_TIMEOUT_MS,
 ): Promise<RefreshResult> {
   const url = `${BASE_URL}/${REFRESH_PATH}`;
   let res: Response;
@@ -85,6 +94,9 @@ export async function refreshAccessToken(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
+      // A timeout surfaces as a plain (transient) error below — never as a
+      // RefreshTokenRejectedError — so the stored token is kept.
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (err) {
     // Surface the underlying cause (DNS/TLS/proxy code, or an undici "Illegal

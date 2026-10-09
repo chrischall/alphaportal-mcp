@@ -39,7 +39,7 @@ import {
   type FetchLike,
 } from './auth.js';
 import { BootstrapError, bootstrapDisabled, bootstrapRefreshToken, type BootstrapFn } from './bootstrap.js';
-import { BASE_URL } from './endpoints.js';
+import { BASE_URL, READ } from './endpoints.js';
 import { DEFAULT_ACCOUNT_KEY, diskSessionIO, type SessionIO } from './session.js';
 
 // Load `.env` for local dev. The try/catch guards a non-Node runtime where
@@ -104,6 +104,8 @@ export class AlphaPortalClient {
    * it would be re-selected on every call and the bootstrap would never run.
    */
   private readonly rejectedTokens = new Set<string>();
+  /** The signed-in user's UserName, resolved once (see {@link principal}). */
+  private principalPromise: Promise<string | undefined> | undefined;
 
   constructor(opts: AlphaPortalClientOptions = {}) {
     this.opts = opts;
@@ -199,6 +201,8 @@ export class AlphaPortalClient {
     this.rejectedTokens.add(rejectedToken);
     this.sessionIO.clear(this.accountId);
     this.apiPromise = undefined;
+    // The next credential may belong to someone else (a fresh browser sign-in).
+    this.principalPromise = undefined;
   }
 
   /** Resolve the refresh token, falling back to the browser bridge, then a helpful error. */
@@ -278,6 +282,28 @@ export class AlphaPortalClient {
       this.apiPromise = undefined;
     });
     return this.apiPromise;
+  }
+
+  /**
+   * The AlphaPortal account this client acts as — the profile's `UserName` —
+   * for binding write confirmations to a principal. Without it, under a shared
+   * `MCP_CONFIRM_SECRET` (a hosted registration with one secret for every
+   * per-user child) a confirm token would verify in another parent's session
+   * for the same district-global studentId and payload. Read once per client
+   * (single-flight) and re-read after a credential is rejected.
+   */
+  principal(): Promise<string | undefined> {
+    if (this.principalPromise) return this.principalPromise;
+    const pending = this.read<{ Profile?: { UserName?: string } }>(READ.profile, {
+      method: 'POST',
+      body: {},
+    }).then((p) => p?.Profile?.UserName || undefined);
+    this.principalPromise = pending;
+    // A failed read is not cached, so the next write retries it.
+    pending.catch(() => {
+      if (this.principalPromise === pending) this.principalPromise = undefined;
+    });
+    return pending;
   }
 
   /**

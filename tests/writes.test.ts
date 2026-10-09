@@ -55,11 +55,29 @@ describe('write tools confirm gate', () => {
     }
   });
 
-  async function harnessWithMock(options?: TestHarnessOptions) {
+  async function harnessWithMock(options?: TestHarnessOptions, userName = 'parent-a@example.com') {
     const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/user/profile'))
+        return new Response(JSON.stringify({ success: true, data: { Profile: { UserName: userName } } }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
       if (url.includes('/public/refresh-token'))
         return new Response(
           JSON.stringify({ success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        );
+      if (url.includes('/user-students/lightlist'))
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              students: [
+                { originalId: '1001', studentName: 'Ada Lovelace', studentId: 42 },
+                { originalId: '1002', studentName: 'Alan Turing', studentId: 7 },
+              ],
+            },
+          }),
           { status: 200, headers: { 'content-type': 'application/json' } },
         );
       return new Response(JSON.stringify({ success: true, data: { ok: true } }), {
@@ -79,7 +97,13 @@ describe('write tools confirm gate', () => {
   type PhaseOne = {
     status: string;
     confirmToken: string;
-    preview: { action: string; method: string; path: string; willSend: Record<string, unknown> };
+    preview: {
+      action: string;
+      method: string;
+      path: string;
+      student?: string;
+      willSend: Record<string, unknown>;
+    };
   };
   const text = (r: { content?: unknown }) =>
     ((r.content as Array<{ type: string; text: string }>)[0]?.text ?? '');
@@ -97,9 +121,33 @@ describe('write tools confirm gate', () => {
       action: 'Edit walk-zone radius',
       method: 'POST',
       path: 'AlphaPortal/v1/user-students/radius-edit',
+      student: 'Ada Lovelace (42)',
       willSend: { studentId: 42, radius: 800 },
     });
     expect(calls('radius-edit')).toBe(0);
+    await harness.close();
+  });
+
+  it('flags a studentId that is not on the signed-in account in the preview', async () => {
+    const { harness, calls } = await harnessWithMock();
+    const parsed = parseToolResult<PhaseOne>(
+      await harness.callTool('alphaportal_edit_walk_radius', { studentId: 99, radiusMeters: 800 }),
+    );
+    expect(parsed.preview.student).toBe('99 (not a student on this account)');
+    expect(calls('radius-edit')).toBe(0);
+    await harness.close();
+  });
+
+  it('names the student in the elicitation prompt too', async () => {
+    let shown = '';
+    const { harness } = await harnessWithMock({
+      elicitation: async (req) => {
+        shown = JSON.stringify(req);
+        return { action: 'decline' };
+      },
+    });
+    await harness.callTool('alphaportal_edit_walk_radius', { studentId: 42, radiusMeters: 800 });
+    expect(shown).toContain('Ada Lovelace (42)');
     await harness.close();
   });
 
@@ -156,6 +204,32 @@ describe('write tools confirm gate', () => {
     });
     expect(text(other)).toContain('TOKEN_INVALID');
     expect(calls('radius-edit')).toBe(0);
+    await harness.close();
+  });
+
+  it('under a shared MCP_CONFIRM_SECRET a token minted for one account is refused for another', async () => {
+    process.env.MCP_CONFIRM_SECRET = 'shared-across-tenants-secret-0123456789';
+    const a = await harnessWithMock(undefined, 'parent-a@example.com');
+    const b = await harnessWithMock(undefined, 'parent-b@example.com');
+    const args = { studentId: 42, radiusMeters: 800 };
+    const { confirmToken } = parseToolResult<PhaseOne>(await a.harness.callTool('alphaportal_edit_walk_radius', args));
+    const cross = await b.harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(text(cross)).toContain('TOKEN_INVALID');
+    expect(b.calls('radius-edit')).toBe(0);
+    // The same account still redeems it.
+    const same = await a.harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(same.isError).toBeFalsy();
+    expect(a.calls('radius-edit')).toBe(1);
+    await a.harness.close();
+    await b.harness.close();
+  });
+
+  it('resolves the signed-in account once per client, not on every write', async () => {
+    const { harness, calls } = await harnessWithMock();
+    const args = { studentId: 42, radiusMeters: 800 };
+    const { confirmToken } = parseToolResult<PhaseOne>(await harness.callTool('alphaportal_edit_walk_radius', args));
+    await harness.callTool('alphaportal_edit_walk_radius', { ...args, confirmToken });
+    expect(calls('/user/profile')).toBe(1);
     await harness.close();
   });
 
@@ -227,6 +301,7 @@ describe('write tools confirm gate', () => {
       action: 'Set notification preferences',
       method: 'POST',
       path: 'AlphaPortal/v1/user-students/setnotification',
+      student: 'Alan Turing (7)',
     });
     expect(parsed.preview.willSend).toMatchObject({ studentId: 7, schoolArrivalNotifyAm: 1 });
     expect(calls('setnotification')).toBe(0);

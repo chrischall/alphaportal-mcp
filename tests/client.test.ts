@@ -284,3 +284,61 @@ describe('AlphaPortalClient auth + envelope', () => {
     expect(urls.some((u) => u.includes('reports-bulk?studentId=42'))).toBe(true);
   });
 });
+
+describe('AlphaPortalClient.principal', () => {
+  const newClient = (fetchImpl: typeof fetch) =>
+    new AlphaPortalClient({ refreshToken: jwt(FUTURE), sessionIO: nullSessionIO, fetchImpl });
+
+  it("resolves to the profile's UserName", async () => {
+    const client = newClient(makeFetch({ reads: { 'user/profile': { Profile: { UserName: 'p@example.com' } } } }));
+    await expect(client.principal()).resolves.toBe('p@example.com');
+  });
+
+  it('resolves to undefined when the profile carries no UserName', async () => {
+    const client = newClient(makeFetch({ reads: { 'user/profile': { Profile: { FullName: 'P' } } } }));
+    await expect(client.principal()).resolves.toBeUndefined();
+  });
+
+  it('does not cache a failed read, so the next write retries it', async () => {
+    let fail = true;
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/public/refresh-token'))
+        return res(200, { success: true, data: { token: jwt(FUTURE), refreshToken: jwt(FUTURE) } });
+      if (fail) return res(200, { success: false, message: 'down' });
+      return res(200, { success: true, data: { Profile: { UserName: 'p@example.com' } } });
+    }) as unknown as typeof fetch;
+    const client = newClient(fetchImpl);
+    await expect(client.principal()).rejects.toThrow(/down/);
+    fail = false;
+    await expect(client.principal()).resolves.toBe('p@example.com');
+  });
+
+  it('re-resolves after the credential is rejected (the next sign-in may be someone else)', async () => {
+    let user = 'a@example.com';
+    let reject = false;
+    const PAST = Math.floor(Date.now() / 1000) - 60;
+    const fetchImpl = vi.fn(async (url: string) => {
+      if (url.includes('/public/refresh-token'))
+        return reject
+          ? res(401, { success: false, message: 'expired' })
+          : // An already-expired access token makes every request refresh first.
+            res(200, { success: true, data: { token: jwt(PAST), refreshToken: jwt(FUTURE) } });
+      return res(200, { success: true, data: { Profile: { UserName: user } } });
+    }) as unknown as typeof fetch;
+    const client = new AlphaPortalClient({
+      refreshToken: jwt(FUTURE),
+      sessionIO: nullSessionIO,
+      fetchImpl,
+      bootstrapImpl: async () => ({
+        localStorage: { ALPHAPORTAL_REFRESH_TOKEN: jwt(FUTURE + 100) },
+        missing: { localStorage: [] },
+      }),
+    });
+    await expect(client.principal()).resolves.toBe('a@example.com');
+    reject = true;
+    await expect(client.read('AlphaCore/v1/user/profile')).rejects.toThrow();
+    reject = false;
+    user = 'b@example.com';
+    await expect(client.principal()).resolves.toBe('b@example.com');
+  });
+});
