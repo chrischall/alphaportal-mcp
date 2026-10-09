@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
-import { minifiedResult } from '@chrischall/mcp-utils';
+import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
+import { READ } from '../endpoints.js';
 import { z } from 'zod';
 
 /**
@@ -22,7 +23,7 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
     async () => {
       try {
         const profile = await client.read<{ Profile?: { UserName?: string; FullName?: string } }>(
-          'AlphaCore/v1/user/profile',
+          READ.profile,
           { method: 'POST', body: {} },
         );
         return minifiedResult({
@@ -35,6 +36,10 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
           authenticated: false,
           hasStaticToken: client.hasStaticToken(),
           note: (err as Error).message,
+          // The "no credentials" error carries the onboarding steps (sign in
+          // with the bridge, or the DevTools capture one-liner) on `hint`; a
+          // returned result would otherwise drop them.
+          ...(err instanceof McpToolError && err.hint ? { hint: err.hint } : {}),
         });
       }
     },
