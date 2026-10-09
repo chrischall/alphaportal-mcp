@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.3](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.2...v1.2.3) (2026-10-09)
+
+
+### Bug Fixes
+
+* annotate tools truthfully and sync manifests with the served tools ([#92](https://github.com/chrischall/alphaportal-mcp/issues/92)) ([e682d19](https://github.com/chrischall/alphaportal-mcp/commit/e682d192c1891cad1899bbe8e54fcbeeaa72bef5))
+* declare the plugin MCP config under the mcpServers key Claude Code reads ([#93](https://github.com/chrischall/alphaportal-mcp/issues/93)) ([a1168f9](https://github.com/chrischall/alphaportal-mcp/commit/a1168f99af2fa4c0e94a8533c5b23ee099003587))
+* **deps:** update @chrischall/mcp-utils to 3.0.0 ([#91](https://github.com/chrischall/alphaportal-mcp/issues/91)) ([830b6df](https://github.com/chrischall/alphaportal-mcp/commit/830b6df3ade27ae588fa26fd4e06400c7586609b))
+* resolve low-severity audit findings ([#88](https://github.com/chrischall/alphaportal-mcp/issues/88)) ([e8025c9](https://github.com/chrischall/alphaportal-mcp/commit/e8025c9173b9783a641165f1233c095fdf1e0c1f))
+* **security:** fence notification text as untrusted and flag the report link as credential-like ([#90](https://github.com/chrischall/alphaportal-mcp/issues/90)) ([ad800d0](https://github.com/chrischall/alphaportal-mcp/commit/ad800d08d4611cd5f7de905ee10c6f8f70472623))
+
 ## [1.2.2](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.1...v1.2.2) (2026-10-07)
 
 
