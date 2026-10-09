@@ -20,7 +20,11 @@ export const BASE_URL = 'https://api.alpharoute.app';
  */
 export const REFRESH_PATH = 'AlphaCore/v1/public/refresh-token';
 
-/** GET/POST read endpoints. `{sid}` = a `studentId`; `{shift}` = 0 (AM) / 1 (PM). */
+/**
+ * GET/POST read endpoints the server calls. `{sid}` = a `studentId`; `{shift}`
+ * = 0 (AM) / 1 (PM). Endpoints no tool uses (account-groups, distance units)
+ * are documented in `docs/ALPHAPORTAL-API.md`, not listed here.
+ */
 export const READ = {
   /** POST {} — the signed-in user's profile. */
   profile: 'AlphaCore/v1/user/profile',
@@ -38,8 +42,6 @@ export const READ = {
   studentStops: 'AlphaPortal/v1/user-students/stops',
   /** GET `/{sid}/{shift}` — live bus GPS for the run (shift 0=AM, 1=PM). */
   vehicleLocation: 'AlphaPortal/v1/user-students/vehicle-location',
-  /** GET — the account groups (districts) the caller belongs to. */
-  accountGroups: 'AlphaPortal/v1/user-students/account-groups',
   /** GET `?studentId=<sid>` — a one-time PDF report download link. */
   reportsBulk: 'AlphaPortal/v1/user-students/reports-bulk',
   /** GET — the notifications feed (arrival/departure alerts). */
@@ -50,31 +52,19 @@ export const READ = {
   schoolLightList: 'AlphaPlan/v1/school/lightlist',
   /** GET — grade list. */
   gradeList: 'AlphaPlan/v1/student/gradelist',
-  /** GET — distance units. */
-  distanceUnitList: 'AlphaPlan/v1/distanceunit/list',
   /** GET — the caller's submitted transportation requests (tracking numbers). */
   requestList: 'AlphaPortal/v1/requests/list',
 } as const;
 
 /**
- * Mutating endpoints. Bodies are transcribed from the web client (see
- * `docs/ALPHAPORTAL-API.md`); every one is confirm-gated in its tool.
+ * Mutating endpoints exposed as tools. Bodies are transcribed from the web
+ * client (see `docs/ALPHAPORTAL-API.md`); every one is confirm-gated in its
+ * tool. The unexposed writes (`setnotification-bulk`, the transportation-request
+ * family) are documented there and deliberately absent here.
  */
 export const WRITE = {
   /** POST — set one student's notification preferences. */
   setNotification: 'AlphaPortal/v1/user-students/setnotification',
-  /** POST — set notification preferences for all students at once. */
-  setNotificationBulk: 'AlphaPortal/v1/user-students/setnotification-bulk',
   /** POST — edit a student's walk-zone radius (meters). */
   radiusEdit: 'AlphaPortal/v1/user-students/radius-edit',
-  /**
-   * POST — validate a transportation request without submitting it. This one is
-   * non-mutating and live-verified (returns eligibility lists); it is still
-   * confirm-gated for consistency but safe to run.
-   */
-  transportValidation: 'AlphaPortal/v1/requests/transportation/validation',
-  /** POST — submit a transportation request. */
-  transportAdd: 'AlphaPortal/v1/requests/transportation/add',
-  /** POST — submit an alternative-stop request. */
-  alternativeAdd: 'AlphaPortal/v1/requests/alternative/add',
 } as const;
