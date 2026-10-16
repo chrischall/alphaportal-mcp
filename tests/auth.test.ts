@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import { withCallSignal } from '@chrischall/mcp-utils';
 import { REFRESH_TIMEOUT_MS, refreshAccessToken, refreshTokenExpiryMs } from '../src/auth.js';
 
 /** Build a minimal JWT with the given `exp` (seconds). */
@@ -43,6 +44,24 @@ describe('refreshAccessToken', () => {
     await expect(refreshAccessToken('oldRT', fetchImpl, 20)).rejects.toThrow(/could not reach/);
     const [, init] = (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('aborts the exchange when the tool call is cancelled, and reports the cancellation (not unreachable)', async () => {
+    let seen: AbortSignal | undefined;
+    const fetchImpl = vi.fn(
+      (_url: string, init: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          seen = init.signal ?? undefined;
+          init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+        }),
+    ) as unknown as typeof fetch;
+    const controller = new AbortController();
+    const pending = withCallSignal(controller.signal, () => refreshAccessToken('oldRT', fetchImpl, 1_000));
+    setTimeout(() => controller.abort(), 5);
+    const err = (await pending.catch((e: unknown) => e)) as Error;
+    expect(seen?.aborted).toBe(true);
+    expect(err.message).not.toMatch(/could not reach/);
+    expect(err.name).toBe('AbortError');
   });
 
   it('defaults the exchange timeout to the 30s the API client uses', () => {

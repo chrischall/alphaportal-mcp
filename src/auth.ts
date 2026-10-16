@@ -16,7 +16,7 @@
  * persists to roll the window forward (see `session.ts`).
  */
 
-import { decodeJwtExp, detectEdgeBlock, EdgeBlockedError } from '@chrischall/mcp-utils';
+import { decodeJwtExp, detectEdgeBlock, EdgeBlockedError, withAmbientCancellation } from '@chrischall/mcp-utils';
 import { BASE_URL, REFRESH_PATH } from './endpoints.js';
 
 /** The subset of the refresh response this server relies on. */
@@ -88,6 +88,11 @@ export async function refreshAccessToken(
   timeoutMs: number = REFRESH_TIMEOUT_MS,
 ): Promise<RefreshResult> {
   const url = `${BASE_URL}/${REFRESH_PATH}`;
+  // Our deadline folded with the running tool call's cancellation: a call the
+  // client gave up on stops the exchange too, instead of pinning the
+  // single-flight refresh behind a 30s timer.
+  const deadline = AbortSignal.timeout(timeoutMs);
+  const signal = withAmbientCancellation(deadline)!;
   let res: Response;
   try {
     res = await fetchImpl(url, {
@@ -96,9 +101,12 @@ export async function refreshAccessToken(
       body: JSON.stringify({ refreshToken }),
       // A timeout surfaces as a plain (transient) error below — never as a
       // RefreshTokenRejectedError — so the stored token is kept.
-      signal: AbortSignal.timeout(timeoutMs),
+      signal,
     });
   } catch (err) {
+    // A cancelled call is the caller's decision, not an unreachable portal:
+    // surface the abort as-is (still transient, so the stored token is kept).
+    if (signal.aborted && !deadline.aborted) throw err;
     // Surface the underlying cause (DNS/TLS/proxy code, or an undici "Illegal
     // invocation" from a mis-bound fetch) and the exact endpoint, so a
     // reachability problem is diagnosable rather than opaque.
