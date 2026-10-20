@@ -41,6 +41,14 @@ describe('packaging', () => {
     expect(hosts).toContain(new URL(BASE_URL).host);
   });
 
+  it('mint.yaml declares a one-line catalog summary within the 200-char limit', () => {
+    // Without `summary` the public mcp-host catalog card shows no description.
+    const mint = readFileSync(join(ROOT, 'mint.yaml'), 'utf8');
+    const summary = mint.match(/^summary:\s*(.+)$/m)?.[1]?.trim();
+    expect(summary, 'mint.yaml must declare a top-level summary').toBeTruthy();
+    expect(summary!.length).toBeLessThanOrEqual(200);
+  });
+
   it('the Claude plugin launches the published package, not the gitignored dist/', () => {
     // fleet-audit#43: a plugin installed from this git repo (marketplace source
     // "./") has no dist/ and no node_modules — dist/ is gitignored — so a

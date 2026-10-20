@@ -1,6 +1,7 @@
 version: 1
 name: AlphaPortal
 slug: alphaportal
+summary: Track your child's AlphaRoute school bus live, see assigned stops and pickup times, read arrival alerts, and adjust notification settings.
 examples:
   - prompt: Where is my kid's school bus right now on the afternoon run?
     note: Live GPS of the PM bus via alphaportal_get_bus_location.
