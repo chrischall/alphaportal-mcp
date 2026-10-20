@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.5](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.4...v1.2.5) (2026-10-20)
+
+
+### Bug Fixes
+
+* **deps:** bump dotenv from 18.0.7 to 18.0.8 in the production-dependencies group ([#104](https://github.com/chrischall/alphaportal-mcp/issues/104)) ([2adf334](https://github.com/chrischall/alphaportal-mcp/commit/2adf334d66f4714c13671a7ddeff5e6f2c40d5f6))
+* **http:** say why the AlphaPortal token refresh could not reach the portal, with a hint keyed to the cause ([#105](https://github.com/chrischall/alphaportal-mcp/issues/105)) ([da6b621](https://github.com/chrischall/alphaportal-mcp/commit/da6b621451db26305fb1a694a581e4b8172e9b5f))
+
+
+### Documentation
+
+* **mint:** add a summary for the public catalog ([#102](https://github.com/chrischall/alphaportal-mcp/issues/102)) ([0db6e66](https://github.com/chrischall/alphaportal-mcp/commit/0db6e6614c6520e1659b3e935d7c77f30542255c))
+* **mint:** add sample prompts for the public catalog ([#100](https://github.com/chrischall/alphaportal-mcp/issues/100)) ([d8903dc](https://github.com/chrischall/alphaportal-mcp/commit/d8903dcb6b501955794fbc6600d482618d6c76e7))
+
 ## [1.2.4](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.3...v1.2.4) (2026-10-16)
 
 
