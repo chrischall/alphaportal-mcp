@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { withCallSignal } from '@chrischall/mcp-utils';
+import { McpToolError, withCallSignal } from '@chrischall/mcp-utils';
 import { REFRESH_TIMEOUT_MS, refreshAccessToken, refreshTokenExpiryMs } from '../src/auth.js';
 
 /** Build a minimal JWT with the given `exp` (seconds). */
@@ -44,6 +44,41 @@ describe('refreshAccessToken', () => {
     await expect(refreshAccessToken('oldRT', fetchImpl, 20)).rejects.toThrow(/could not reach/);
     const [, init] = (fetchImpl as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(init.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('names the host, the cause code and a hint keyed to it when the network refuses the exchange', async () => {
+    const boom = new TypeError('fetch failed', {
+      cause: Object.assign(new Error('connect ECONNREFUSED 1.2.3.4:443'), { code: 'ECONNREFUSED' }),
+    });
+    const fetchImpl = vi.fn(async () => {
+      throw boom;
+    }) as unknown as typeof fetch;
+    const err = (await refreshAccessToken('SUPERSECRETTOKEN', fetchImpl).catch((e: unknown) => e)) as McpToolError;
+    expect(err).toBeInstanceOf(McpToolError);
+    expect(err.kind).toBe('transport');
+    expect(err.message).toBe('Could not reach AlphaPortal at api.alpharoute.app (ECONNREFUSED: connect ECONNREFUSED 1.2.3.4:443).');
+    expect(err.message).not.toContain('SUPERSECRETTOKEN');
+    expect(err.hint).toMatch(/proxy|firewall/i);
+    expect(err.cause).toBe(boom);
+  });
+
+  it("points a hosted connector's egress-proxy refusal at the registration's allow-list", async () => {
+    const aborted = Object.assign(new Error('Proxy response (403) !== 200 when HTTP Tunneling'), { code: 'UND_ERR_ABORTED' });
+    const fetchImpl = vi.fn(async () => {
+      throw new TypeError('fetch failed', { cause: new Error('Request was cancelled.', { cause: aborted }) });
+    }) as unknown as typeof fetch;
+    const err = (await refreshAccessToken('rt', fetchImpl).catch((e: unknown) => e)) as McpToolError;
+    expect(err.hint).toMatch(/egress allow-list/);
+    expect(err.hint).not.toMatch(/VPN|DNS/);
+  });
+
+  it('keeps naming the endpoint and the cause for a failure that is not a transport error (a mis-bound fetch)', async () => {
+    const fetchImpl = vi.fn(async () => {
+      throw new TypeError('Illegal invocation');
+    }) as unknown as typeof fetch;
+    await expect(refreshAccessToken('rt', fetchImpl)).rejects.toThrow(
+      /could not reach https:\/\/api\.alpharoute\.app\/.*: Illegal invocation/,
+    );
   });
 
   it('aborts the exchange when the tool call is cancelled, and reports the cancellation (not unreachable)', async () => {

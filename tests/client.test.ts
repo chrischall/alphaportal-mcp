@@ -230,7 +230,9 @@ describe('AlphaPortalClient auth + envelope', () => {
 
   it('surfaces the underlying cause when the refresh fetch throws (reachability)', async () => {
     const throwingFetch = (async () => {
-      throw Object.assign(new Error('fetch failed'), { cause: { code: 'ENOTFOUND' } });
+      throw new TypeError('fetch failed', {
+        cause: Object.assign(new Error('getaddrinfo ENOTFOUND api.alpharoute.app'), { code: 'ENOTFOUND' }),
+      });
     }) as unknown as typeof fetch;
     const client = new AlphaPortalClient({
       refreshToken: jwt(FUTURE),
@@ -238,7 +240,7 @@ describe('AlphaPortalClient auth + envelope', () => {
       fetchImpl: throwingFetch,
     });
     await expect(client.read('AlphaPortal/v1/user-students/list')).rejects.toThrow(
-      /could not reach https:\/\/api\.alpharoute\.app.*ENOTFOUND/,
+      /Could not reach AlphaPortal at api\.alpharoute\.app \(ENOTFOUND/,
     );
   });
 
