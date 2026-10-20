@@ -16,7 +16,13 @@
  * persists to roll the window forward (see `session.ts`).
  */
 
-import { decodeJwtExp, detectEdgeBlock, EdgeBlockedError, withAmbientCancellation } from '@chrischall/mcp-utils';
+import {
+  decodeJwtExp,
+  describeTransportFailure,
+  detectEdgeBlock,
+  EdgeBlockedError,
+  withAmbientCancellation,
+} from '@chrischall/mcp-utils';
 import { BASE_URL, REFRESH_PATH } from './endpoints.js';
 
 /** The subset of the refresh response this server relies on. */
@@ -77,8 +83,9 @@ export const REFRESH_TIMEOUT_MS = 30_000;
  *
  * Throws `EdgeBlockedError` when a CDN/WAF refused the exchange (the token was
  * never judged — keep it), `RefreshTokenRejectedError` on AlphaPortal's own
- * 401, `RefreshHttpError` on any other non-2xx, and a plain `Error` on a
- * malformed response; the caller
+ * 401, `RefreshHttpError` on any other non-2xx, a `kind: 'transport'`
+ * `McpToolError` (mcp-utils' `describeTransportFailure`) when the request never
+ * got a response, and a plain `Error` on a malformed response; the caller
  * (`TokenManager.refresh`) surfaces it, and the tool boundary redacts it. The
  * error message never echoes the token — only its shape-less failure reason.
  */
@@ -107,9 +114,14 @@ export async function refreshAccessToken(
     // A cancelled call is the caller's decision, not an unreachable portal:
     // surface the abort as-is (still transient, so the stored token is kept).
     if (signal.aborted && !deadline.aborted) throw err;
-    // Surface the underlying cause (DNS/TLS/proxy code, or an undici "Illegal
-    // invocation" from a mis-bound fetch) and the exact endpoint, so a
-    // reachability problem is diagnosable rather than opaque.
+    // undici's bare `TypeError('fetch failed')`: name the host, the cause
+    // code and a hint keyed to it (DNS, TLS, refused, an egress proxy's
+    // refusal). Still a plain transient error, so the stored token is kept.
+    const described = describeTransportFailure(err, url, 'AlphaPortal');
+    if (described) throw described;
+    // Anything else (our deadline, an undici "Illegal invocation" from a
+    // mis-bound fetch): surface the cause and the exact endpoint, so the
+    // problem is diagnosable rather than opaque.
     const e = err as Error & { cause?: { code?: string; message?: string } };
     const cause = e.cause?.code ?? e.cause?.message ?? e.message;
     throw new Error(`AlphaPortal token refresh could not reach ${url}: ${cause}`);
