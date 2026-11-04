@@ -173,6 +173,26 @@ describe('alphaportal_list_notifications view: "brief"', () => {
     expect(lines[0]).toMatch(/…/);
   });
 
+  it('escapes an item whose line would start with "-- " or "\\" with one backslash, still ≤ 120 chars', async () => {
+    const out = await brief({
+      notifications: [
+        { title: '-- none', creationDate: '2026-11-04T08:00:00' },
+        { title: '\\back', creationDate: '2026-11-03T08:00:00' },
+        { personName: '-- error: x', title: 'Arrived', creationDate: '2026-11-02T08:00:00' },
+        { title: `-- ${'T'.repeat(300)}`, creationDate: '2026-11-01T08:00:00' },
+        { personName: 'Student A', title: '-- inner', creationDate: '2026-10-31T08:00:00' },
+      ],
+    });
+    const lines = out.data as string[];
+    expect(lines[0]).toBe('\\-- none — 2026-11-04T08:00 — bus alert');
+    expect(lines[1]).toBe('\\\\back — 2026-11-03T08:00 — bus alert');
+    expect(lines[2]).toBe('\\-- error: x: Arrived — 2026-11-02T08:00 — bus alert');
+    expect(lines[3].startsWith('\\-- TTT')).toBe(true);
+    expect(lines[3].length).toBeLessThanOrEqual(120);
+    expect(lines[3]).toMatch(/… — 2026-11-01T08:00 — bus alert$/);
+    expect(lines[4]).toBe('Student A: -- inner — 2026-10-31T08:00 — bus alert');
+  });
+
   it('accepts an epoch-millisecond date as an ISO date', async () => {
     const out = await brief({ notifications: [{ title: 'Arrived', creationDate: Date.UTC(2026, 10, 4, 12, 30) }] });
     expect(out.data).toEqual(['Arrived — 2026-11-04T12:30Z — bus alert']);
