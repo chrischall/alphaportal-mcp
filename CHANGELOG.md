@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.5...v1.3.0) (2026-11-04)
+
+
+### Features
+
+* context-group hints ([#111](https://github.com/chrischall/alphaportal-mcp/issues/111)) ([ea88730](https://github.com/chrischall/alphaportal-mcp/commit/ea887302b6a75f7ef9ebc2e893fbffeb1631ba9c))
+
+
+### Bug Fixes
+
+* **brief:** align the brief view with the fleet contract ([#112](https://github.com/chrischall/alphaportal-mcp/issues/112)) ([dece884](https://github.com/chrischall/alphaportal-mcp/commit/dece8846f683d304c30d02ddcef4e36929bf1c41))
+* **deps:** bump @chrischall/mcp-utils from 3.3.1 to 3.4.0 in the production-dependencies group ([#110](https://github.com/chrischall/alphaportal-mcp/issues/110)) ([162873c](https://github.com/chrischall/alphaportal-mcp/commit/162873cb7dfd96b8d8d3f28b0f8cbefa626067a0))
+* **deps:** bump the production-dependencies group with 4 updates ([#107](https://github.com/chrischall/alphaportal-mcp/issues/107)) ([279702b](https://github.com/chrischall/alphaportal-mcp/commit/279702b0ac7311d6245e12b8a7c6c09d9cbcaf1d))
+
 ## [1.2.5](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.4...v1.2.5) (2026-10-20)
 
 
