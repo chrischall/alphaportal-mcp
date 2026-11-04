@@ -94,7 +94,8 @@ gateway. Its one canonical read, answering one line per item with `view: "brief"
 - **what's new** — `alphaportal_list_notifications`: the bus arrival/departure alerts,
   newest first, `<student>: <title> — <ISO date> — bus alert` (at most 20, then a
   `-- N of M shown` note; `-- none` when the feed is empty), inside the untrusted-data
-  envelope because the text is the district's.
+  envelope because the text is the district's. A line whose text would start with `-- `
+  or `\` gets one leading `\`, so a district title can never read as a note.
 
 It takes no subject and no date range: the feed covers every student on the account,
 and each line names its student. Nothing here is canonical for what's due or what's on

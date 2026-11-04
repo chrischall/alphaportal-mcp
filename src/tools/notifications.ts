@@ -57,11 +57,17 @@ function sortKey(n: Notification): number {
   return Date.parse(d.endsWith('Z') ? d : `${d.length === 10 ? `${d}T00:00` : d}Z`);
 }
 
-/** One brief line, its title shortened so the line is at most 120 characters. */
+/**
+ * One brief line, its title shortened so the line is at most 120 characters.
+ * A title that starts with `-- ` or `\` is escaped with one leading `\` first,
+ * so district-written text can never read as a `-- ` note (the gateway strips
+ * one backslash from every item line).
+ */
 function briefLine(title: string, date: string, status: string): string {
+  const escaped = title.startsWith('-- ') || title.startsWith('\\') ? `\\${title}` : title;
   const tail = ` — ${date} — ${status}`;
   const room = 120 - tail.length;
-  const shown = title.length > room ? `${title.slice(0, Math.max(room - 1, 0))}…` : title;
+  const shown = escaped.length > room ? `${escaped.slice(0, Math.max(room - 1, 0))}…` : escaped;
   return `${shown}${tail}`;
 }
 
