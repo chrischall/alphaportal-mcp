@@ -16,7 +16,7 @@ notification preferences and walk-zone radius.
 - `alphaportal_get_student` — a child's school plus morning/afternoon stops
 - `alphaportal_get_student_stops` — assigned stops with times and locations
 - `alphaportal_get_bus_location` — **live GPS of the bus** for the AM or PM run
-- `alphaportal_list_notifications` — arrival/departure alerts
+- `alphaportal_list_notifications` — arrival/departure alerts (`view: "brief"` for one line per alert)
 - `alphaportal_list_requests` — submitted transportation requests + tracking numbers
 - `alphaportal_get_report_link` — a PDF report download link
 - `alphaportal_list_schools`, `alphaportal_list_grades` — district reference data
