@@ -3,6 +3,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { confirmTokenParam, confirmWrite, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ, WRITE } from '../endpoints.js';
+import { schoolMeta } from './hints.js';
 
 /**
  * The five notification categories the portal exposes, each togglable per
@@ -76,6 +77,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       description:
         "Set a student's walk-zone radius, in meters. This can affect transportation eligibility, so it asks the user to confirm first: a confirmation prompt where the client supports one; otherwise the first call returns a preview of the exact payload and a confirmToken, and only a repeat call with that token proceeds (see MCP_CONFIRM_MODE). Verified required fields: studentId, radius.",
       annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: true },
+      _meta: schoolMeta('change', { aliases: ['walk zone', 'walk radius'] }),
       inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
         radiusMeters: z
@@ -110,6 +112,7 @@ export function registerWriteTools(server: McpServer, client: AlphaPortalClient)
       description:
         "Set a student's transportation notification preferences (push/email, per AM/PM run) across the categories the district enables: stopRadiusEntry, studentScan, backupBus, schoolArrival, stopServiced. Asks the user to confirm first: a confirmation prompt where the client supports one; otherwise the first call returns a preview of the exact payload and a confirmToken, and only a repeat call with that token proceeds (see MCP_CONFIRM_MODE). NOTE: the portal sends the whole preference set at once; categories you omit may be left unchanged or reset by the server — review the preview first.",
       annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true },
+      _meta: schoolMeta('turn-on-off', { aliases: ['bus alerts', 'bus notifications', 'arrival alerts'] }),
       inputSchema: z.object({
         studentId: z.number().int().describe('The numeric studentId.'),
         studentOriginalId: z

@@ -3,6 +3,7 @@ import { McpToolError, minifiedResult } from '@chrischall/mcp-utils';
 import type { AlphaPortalClient } from '../client.js';
 import { READ } from '../endpoints.js';
 import { z } from 'zod';
+import { schoolMeta } from './hints.js';
 
 /**
  * A credential-free health/status read: can the server currently authenticate?
@@ -18,6 +19,7 @@ export function registerSessionTools(server: McpServer, client: AlphaPortalClien
       description:
         'Check whether the server can authenticate to AlphaPortal: it resolves the refresh token (from ALPHAPORTAL_REFRESH_TOKEN, the saved session, or a signed-in browser tab via the bridge) and tries to mint an access token. Returns no credentials.',
       annotations: { readOnlyHint: true, openWorldHint: true },
+      _meta: schoolMeta('other'),
       inputSchema: z.object({}),
     },
     async () => {

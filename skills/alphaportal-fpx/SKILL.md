@@ -86,6 +86,25 @@ alpha AlphaPortal/v1/notifications/list | jq '.data.notifications[] | {title, bo
 See `references/endpoints.md` for the full endpoint list, path variables, and
 ready-to-run `jq` recipes.
 
+## In context groups
+
+The alphaportal MCP (not this curl helper) joins the **school** group on an mcp-host
+gateway. Its one canonical read, answering one line per item with `view: "brief"`:
+
+- **what's new** — `alphaportal_list_notifications`: the bus arrival/departure alerts,
+  newest first, `<student>: <title> — <ISO date> — bus alert` (at most 20, then a
+  `-- N of M shown` note; `-- none` when the feed is empty), inside the untrusted-data
+  envelope because the text is the district's.
+
+It takes no subject and no date range: the feed covers every student on the account,
+and each line names its student. Nothing here is canonical for what's due or what's on
+(stops and the live bus location are lookups). A compound ask looks like "did the bus
+get to school, and anything due at school?" — the group answers the bus part from this
+read and the rest from the other school sources.
+The MCP lifts its refresh token from a signed-in AlphaPortal tab over the browser bridge
+when it holds none, so until it has one the group answers "needs your browser open"
+for this source instead of an empty list.
+
 ## Status codes
 
 - `401` — the access token expired (re-run step 2) or the refresh token died
