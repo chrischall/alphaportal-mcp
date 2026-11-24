@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/chrischall/alphaportal-mcp/compare/v1.3.0...v1.3.1) (2026-11-24)
+
+
+### Bug Fixes
+
+* **deps:** bump @chrischall/mcp-utils from 3.4.0 to 3.7.1 in the production-dependencies group ([#114](https://github.com/chrischall/alphaportal-mcp/issues/114)) ([ef60ba9](https://github.com/chrischall/alphaportal-mcp/commit/ef60ba9cb4345c86e3a79308e2076cda2ed4e1f1))
+* **deps:** bump the production-dependencies group with 3 updates ([#116](https://github.com/chrischall/alphaportal-mcp/issues/116)) ([ceb58d4](https://github.com/chrischall/alphaportal-mcp/commit/ceb58d4c5125a231dfd38f5cc6ed195c56a4e770))
+
 ## [1.3.0](https://github.com/chrischall/alphaportal-mcp/compare/v1.2.5...v1.3.0) (2026-11-04)
 
 
